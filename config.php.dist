@@ -1,0 +1,23 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Stefano "Yoghi" Tamagnini
+ * Date: 07/05/14 - 21:52
+ *
+ */
+$config = array(
+    'base_url' => '',
+    'utente' => '',
+    'password' => '',
+    'key_path' => '',
+    'log' => array(
+        'filename' => './logs/'.date('Y-m-d').'.log'
+    ),
+    'db' => array(
+        'type' => 'mysql', //pgsql
+        'user' => '',
+        'password' => '',
+        'host' => '',
+        'database' => ''
+    )
+);
