@@ -97,10 +97,19 @@ if (isset($arguments_parsed['import-ragazzi']) || isset($arguments_parsed['impor
 }
 
 if (isset($arguments_parsed['import-gruppi'])) {
+
     $gruppi = $proxy->getGruppi($all);
 
     foreach ($gruppi as $gruppo) {
         $log->addInfo('Gruppo ', array('codice' => $gruppo->codice, 'nome' => $gruppo->nome, 'unita' => $gruppo->unita, 'regione' => $gruppo->regione));
+
+        $gruppo_row = R::dispense('gruppi');
+        $gruppo_row->nome 			= $gruppo->nome;
+        $gruppo_row->sottocampo 	= -1;
+        $gruppo_row->idgruppo 		= $gruppo->codice;
+        $gruppo_row->gemellaggio 	= -1;
+        $id = R::store($gruppo_row);
+
     }
 }
 
@@ -108,10 +117,30 @@ if (isset($arguments_parsed['import-ragazzi'])) {
     $ragazzi = $proxy->getRagazzi($all);
     foreach ($ragazzi as $ragazzo) {
         $log->addInfo('Ragazzo ', array('codicesocio' => $ragazzo->codicesocio, 'gruppo' => $ragazzo->gruppo, 'unita' => $ragazzo->unita, 'strada1' => $ragazzo->strada1, 'strada2' => $ragazzo->strada2, 'strada3' => $ragazzo->strada3));
+
+        $ragazzo_row = R::dispense('ragazzo');
+        $ragazzo_row->codicecensimento	= $ragazzo->codicesocio;
+        $ragazzo_row->nome				= $ragazzo->nome;
+        $ragazzo_row->cognome			= $ragazzo->cognome;
+        $ragazzo_row->eta				= 0;
+        $ragazzo_row->idgruppo			= $ragazzo->gruppo;
+        $ragazzo_row->handicap			= 0;
+        $ragazzo_row->novizio			= 0;
+
+        // selettore sulle $ragazzo->strada3
+
+        $ragazzo_row->stradadicoraggio1	= 0;
+        $ragazzo_row->stradadicoraggio2	= 0;
+        $ragazzo_row->stradadicoraggio3	= 0;
+        $ragazzo_row->stradadicoraggio4	= 0;
+        $ragazzo_row->stradadicoraggio5	= 0;
+
+        $id = R::store($ragazzo_row);
+
     }
 }
 
-if (isset($arguments_parsed['import-laboratori-interni'])) {
+if (isset($arguments_parsed['import-internal-lab'])) {
 
     $inputFileName = 'interni.xlsx';
     //  Read your Excel workbook
@@ -142,7 +171,7 @@ if (isset($arguments_parsed['import-laboratori-interni'])) {
 
 }
 
-if (isset($arguments_parsed['import-laboratori-esterni'])) {
+if (isset($arguments_parsed['import-external-lab'])) {
 
     $inputFileName = 'esterni.xlsx';
     //  Read your Excel workbook
@@ -172,3 +201,42 @@ if (isset($arguments_parsed['import-laboratori-esterni'])) {
     }
 
 }
+
+
+if (isset($arguments_parsed['import-subarea'])) {
+
+    /*
+    // QUARTIERI
+        $Reader = new SpreadsheetReader('quartieri.xlsx');
+        $Sheets = $Reader -> Sheets();
+
+        $Reader -> ChangeSheet(0);
+
+        $totale_sottocampo = array();
+
+        foreach ($Reader as $Row)
+        {
+            //$quartiere_row = R::dispense('quartiere');
+            $quartiere_row = new \stdClass;
+            if (!empty($Row[0]) && is_numeric($Row[0]) ) {
+                $quartiere_row->sottocampo      = intval($Row[0]);
+                $quartiere_row->gemellaggio     = intval(str_replace('Route ','',$Row[1]));  // IN STAMPA DEVE AVER IL FORMATO 3 CIFRE str_pad($input, 3, '0', STR_PAD_LEFT);
+                $quartiere_row->totale          = intval($Row[22]);
+                if ( isset($totale_sottocampo[$quartiere_row->sottocampo]) ) {
+                    $totale_sottocampo[$quartiere_row->sottocampo] = $totale_sottocampo[$quartiere_row->sottocampo] + $quartiere_row->totale;
+                } else {
+                    $totale_sottocampo[$quartiere_row->sottocampo] = array();
+                    $totale_sottocampo[$quartiere_row->sottocampo] = $quartiere_row->totale;
+                }
+                //var_dump($quartiere_row);
+            }
+        }
+
+        print_r($totale_sottocampo);
+    */
+
+}
+
+
+
+
