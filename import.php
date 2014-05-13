@@ -168,6 +168,7 @@ try {
                 $ragazzo_row->idunitagruppo     = $ragazzo->unita;
 
                 switch($eta_ragazzo){
+                    case 15:
                     case 16:
                     case 17:
                         $ragazzo_row->novizio			= 1; //da ricavare in base all'eta (16-17)
