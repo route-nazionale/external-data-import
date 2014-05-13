@@ -134,157 +134,172 @@ try {
     }
 
     if (isset($arguments_parsed['import-ragazzi'])) {
-        $ragazzi = $proxy->getRagazzi($all);
-        foreach ($ragazzi as $ragazzo) {
-            $log->addInfo('Ragazzo ', array('codicesocio' => $ragazzo->codicesocio, 'gruppo' => $ragazzo->gruppo, 'unita' => $ragazzo->unita, 'strada1' => $ragazzo->strada1, 'strada2' => $ragazzo->strada2, 'strada3' => $ragazzo->strada3));
 
-            $ragazzo_row = R::dispense('ragazzo');
-            $ragazzo_row->codicecensimento	= $ragazzo->codicesocio;
-            $ragazzo_row->nome				= $ragazzo->nome;
-            $ragazzo_row->cognome			= $ragazzo->cognome;
+        $i = 0;
+        $running = true;
+        while($running){
 
-            $ragazzo_row->sesso             = $ragazzo->sesso;
+            $ragazzi = $proxy->getRagazzi($i,50);
 
-            $ragazzo_row->datanascita       = $ragazzo->datanascita;
-
-            $eta_ragazzo = getAge($ragazzo->datanascita);//Formato 1988-01-31 YYYY-MM-GG
-            $ragazzo_row->eta				= $eta_ragazzo;
-
-            $ragazzo_row->idgruppo			= $ragazzo->gruppo;
-            $ragazzo_row->idunitagruppo     = $ragazzo->unita;
-
-            switch($eta_ragazzo){
-                case 16:
-                case 17:
-                    $ragazzo_row->novizio			= 1; //da ricavare in base all'eta (16-17)
-                    break;
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                    $ragazzo_row->novizio			= 0; //da ricavare in base all'eta (16-17)
-                    break;
-                default:
-                    \cli\out('invalid age : ' . $eta_ragazzo . "\n");
-                    exit - 1;
-                    break;
-            }
-
-            $ragazzo_row->stradadicoraggio1	= 0;
-            $ragazzo_row->stradadicoraggio2	= 0;
-            $ragazzo_row->stradadicoraggio3	= 0;
-            $ragazzo_row->stradadicoraggio4	= 0;
-            $ragazzo_row->stradadicoraggio5	= 0;
-
-            switch($ragazzo->strada1){
-                case 1:
-                    $ragazzo_row->stradadicoraggio1	= 1;
-                    break;
-                case 2:
-                    $ragazzo_row->stradadicoraggio2	= 1;
-                    break;
-                case 3:
-                    $ragazzo_row->stradadicoraggio3	= 1;
-                    break;
-                case 4:
-                    $ragazzo_row->stradadicoraggio4	= 1;
-                    break;
-                case 5:
-                    $ragazzo_row->stradadicoraggio5	= 1;
-                    break;
-                default:
-                    \cli\out('invalid data strada1 : ' . $ragazzo->strada1 . "\n");
-                    exit - 1;
-                    break;
-            }
-
-            switch($ragazzo->strada2){
-                case 1:
-                    $ragazzo_row->stradadicoraggio1	= 1;
-                    break;
-                case 2:
-                    $ragazzo_row->stradadicoraggio2	= 1;
-                    break;
-                case 3:
-                    $ragazzo_row->stradadicoraggio3	= 1;
-                    break;
-                case 4:
-                    $ragazzo_row->stradadicoraggio4	= 1;
-                    break;
-                case 5:
-                    $ragazzo_row->stradadicoraggio5	= 1;
-                    break;
-                default:
-                    \cli\out('invalid data strada2 : ' . $ragazzo->strada2 . "\n");
-                    exit - 1;
-                    break;
-            }
-
-            switch($ragazzo->strada3){
-                case 1:
-                    $ragazzo_row->stradadicoraggio1	= 1;
-                    break;
-                case 2:
-                    $ragazzo_row->stradadicoraggio2	= 1;
-                    break;
-                case 3:
-                    $ragazzo_row->stradadicoraggio3	= 1;
-                    break;
-                case 4:
-                    $ragazzo_row->stradadicoraggio4	= 1;
-                    break;
-                case 5:
-                    $ragazzo_row->stradadicoraggio5	= 1;
-                    break;
-                default:
-                    \cli\out('invalid data strada3 : ' . $ragazzo->strada3 . "\n");
-                    exit - 1;
-                    break;
-            }
-
-
-            $ragazzo_row->colazione = $ragazzo->colazione;
-
-            $ragazzo_row->alimentari = $ragazzo->alimentari;
-
-            if ( $ragazzo->intolleranzealimentari->presenti != 0 ){
-                $ragazzo_row->intolleranzealimentari = $ragazzo->intolleranzealimentari->elenco;
+            if ($all) {
+                $ragazzi_estratti = count($ragazzi);
+                $i += $ragazzi_estratti;
+                if ( $ragazzi_estratti < 50 ) $running = false;
             } else {
-                $ragazzo_row->intolleranzealimentari = NULL;
+                $running = false;
             }
 
-            if ( $ragazzo->allergiealimentari->presenti != 0 ){
-                $ragazzo_row->allergiealimentari = $ragazzo->allergiealimentari->elenco;
-            } else {
-                $ragazzo_row->allergiealimentari = NULL;
+            foreach ($ragazzi as $ragazzo) {
+                $log->addInfo('Ragazzo ', array('codicesocio' => $ragazzo->codicesocio, 'gruppo' => $ragazzo->gruppo, 'unita' => $ragazzo->unita, 'strada1' => $ragazzo->strada1, 'strada2' => $ragazzo->strada2, 'strada3' => $ragazzo->strada3));
+
+                $ragazzo_row = R::dispense('ragazzo');
+                $ragazzo_row->codicecensimento	= $ragazzo->codicesocio;
+                $ragazzo_row->nome				= $ragazzo->nome;
+                $ragazzo_row->cognome			= $ragazzo->cognome;
+
+                $ragazzo_row->sesso             = $ragazzo->sesso;
+
+                $ragazzo_row->datanascita       = $ragazzo->datanascita;
+
+                $eta_ragazzo = getAge($ragazzo->datanascita);//Formato 1988-01-31 YYYY-MM-GG
+                $ragazzo_row->eta				= $eta_ragazzo;
+
+                $ragazzo_row->idgruppo			= $ragazzo->gruppo;
+                $ragazzo_row->idunitagruppo     = $ragazzo->unita;
+
+                switch($eta_ragazzo){
+                    case 16:
+                    case 17:
+                        $ragazzo_row->novizio			= 1; //da ricavare in base all'eta (16-17)
+                        break;
+                    case 18:
+                    case 19:
+                    case 20:
+                    case 21:
+                        $ragazzo_row->novizio			= 0; //da ricavare in base all'eta (16-17)
+                        break;
+                    default:
+                        \cli\out('invalid age : ' . $eta_ragazzo . "\n");
+                        exit - 1;
+                        break;
+                }
+
+                $ragazzo_row->stradadicoraggio1	= 0;
+                $ragazzo_row->stradadicoraggio2	= 0;
+                $ragazzo_row->stradadicoraggio3	= 0;
+                $ragazzo_row->stradadicoraggio4	= 0;
+                $ragazzo_row->stradadicoraggio5	= 0;
+
+                switch($ragazzo->strada1){
+                    case 1:
+                        $ragazzo_row->stradadicoraggio1	= 1;
+                        break;
+                    case 2:
+                        $ragazzo_row->stradadicoraggio2	= 1;
+                        break;
+                    case 3:
+                        $ragazzo_row->stradadicoraggio3	= 1;
+                        break;
+                    case 4:
+                        $ragazzo_row->stradadicoraggio4	= 1;
+                        break;
+                    case 5:
+                        $ragazzo_row->stradadicoraggio5	= 1;
+                        break;
+                    default:
+                        \cli\out('invalid data strada1 : ' . $ragazzo->strada1 . "\n");
+                        exit - 1;
+                        break;
+                }
+
+                switch($ragazzo->strada2){
+                    case 1:
+                        $ragazzo_row->stradadicoraggio1	= 1;
+                        break;
+                    case 2:
+                        $ragazzo_row->stradadicoraggio2	= 1;
+                        break;
+                    case 3:
+                        $ragazzo_row->stradadicoraggio3	= 1;
+                        break;
+                    case 4:
+                        $ragazzo_row->stradadicoraggio4	= 1;
+                        break;
+                    case 5:
+                        $ragazzo_row->stradadicoraggio5	= 1;
+                        break;
+                    default:
+                        \cli\out('invalid data strada2 : ' . $ragazzo->strada2 . "\n");
+                        exit - 1;
+                        break;
+                }
+
+                switch($ragazzo->strada3){
+                    case 1:
+                        $ragazzo_row->stradadicoraggio1	= 1;
+                        break;
+                    case 2:
+                        $ragazzo_row->stradadicoraggio2	= 1;
+                        break;
+                    case 3:
+                        $ragazzo_row->stradadicoraggio3	= 1;
+                        break;
+                    case 4:
+                        $ragazzo_row->stradadicoraggio4	= 1;
+                        break;
+                    case 5:
+                        $ragazzo_row->stradadicoraggio5	= 1;
+                        break;
+                    default:
+                        \cli\out('invalid data strada3 : ' . $ragazzo->strada3 . "\n");
+                        exit - 1;
+                        break;
+                }
+
+
+                $ragazzo_row->colazione = $ragazzo->colazione;
+
+                $ragazzo_row->alimentari = $ragazzo->alimentari;
+
+                if ( $ragazzo->intolleranzealimentari->presenti != 0 ){
+                    $ragazzo_row->intolleranzealimentari = $ragazzo->intolleranzealimentari->elenco;
+                } else {
+                    $ragazzo_row->intolleranzealimentari = NULL;
+                }
+
+                if ( $ragazzo->allergiealimentari->presenti != 0 ){
+                    $ragazzo_row->allergiealimentari = $ragazzo->allergiealimentari->elenco;
+                } else {
+                    $ragazzo_row->allergiealimentari = NULL;
+                }
+
+                if ( $ragazzo->allergiefarmaci->presenti != 0 ){
+                    $ragazzo_row->allergiefarmaci = $ragazzo->allergiefarmaci->elenco;
+                } else {
+                    $ragazzo_row->allergiefarmaci = NULL;
+                }
+
+                if ( $ragazzo->disabilita->presenti != 0 ){
+                    $ragazzo_row->sensoriali = $ragazzo->disabilita->sensoriali;
+                    $ragazzo_row->psichiche = $ragazzo->disabilita->psichiche;
+                    $ragazzo_row->lis = $ragazzo->disabilita->lis;
+                    $ragazzo_row->fisiche = $ragazzo->disabilita->fisiche;
+                } else {
+                    $ragazzo_row->sensoriali = NULL;
+                    $ragazzo_row->psichiche = NULL;
+                    $ragazzo_row->lis = NULL;
+                    $ragazzo_row->fisiche = NULL;
+                }
+
+                if ( $ragazzo->patologie->presenti != 0 ){
+                    $ragazzo_row->patologie = $ragazzo->patologie->descrizione;
+                } else {
+                    $ragazzo_row->patologie = NULL;
+                }
+
+                $id = R::store($ragazzo_row);
+
             }
-
-            if ( $ragazzo->allergiefarmaci->presenti != 0 ){
-                $ragazzo_row->allergiefarmaci = $ragazzo->allergiefarmaci->elenco;
-            } else {
-                $ragazzo_row->allergiefarmaci = NULL;
-            }
-
-            if ( $ragazzo->disabilita->presenti != 0 ){
-                $ragazzo_row->sensoriali = $ragazzo->disabilita->sensoriali;
-                $ragazzo_row->psichiche = $ragazzo->disabilita->psichiche;
-                $ragazzo_row->lis = $ragazzo->disabilita->lis;
-                $ragazzo_row->fisiche = $ragazzo->disabilita->fisiche;
-            } else {
-                $ragazzo_row->sensoriali = NULL;
-                $ragazzo_row->psichiche = NULL;
-                $ragazzo_row->lis = NULL;
-                $ragazzo_row->fisiche = NULL;
-            }
-
-            if ( $ragazzo->patologie->presenti != 0 ){
-                $ragazzo_row->patologie = $ragazzo->patologie->descrizione;
-            } else {
-                $ragazzo_row->patologie = NULL;
-            }
-
-            $id = R::store($ragazzo_row);
-
         }
     }
 

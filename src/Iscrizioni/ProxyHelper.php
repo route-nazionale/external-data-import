@@ -81,8 +81,8 @@ class ProxyHelper {
         return $gruppi_totali;
     }
 
-    public function getRagazzi($all = false){
-        $response = file_get_contents($this->baseUrl.'/getRagazzi/start/0/token/'.$this->currentToken);
+    public function getRagazzi($from,$length){
+        $response = file_get_contents($this->baseUrl.'/getRagazzi/start/'.$from.'/token/'.$this->currentToken);
         $ragazzi = json_decode($this->decodeAES($response));
 
         $ragazzi_totali = array();
@@ -90,7 +90,7 @@ class ProxyHelper {
         $ragazzi_totali = array_merge($ragazzi_totali,$ragazzi[0]->partecipanti);
 
         $i = count($ragazzi_totali);
-        while ( $all && $ragazzi[0]->other == 'ok' ) {
+        while ( $ragazzi[0]->other == 'ok' && $i < $length ) {
             $response = file_get_contents($this->baseUrl.'/getRagazzi/start/'.$i.'/token/'.$this->currentToken);
             $ragazzi = json_decode($this->decodeAES($response));
             $ragazzi_totali = array_merge($ragazzi_totali,$ragazzi[0]->partecipanti);
