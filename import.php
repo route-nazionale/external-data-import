@@ -74,6 +74,7 @@ $password = $config['db']['password'];
 
 // setto il database di default
 R::setup($dsn, $username, $password);
+R::freeze(false);
 
 $all = false; //demo mode
 $proxy = new \Iscrizioni\ProxyHelper($config['base_url']);
@@ -122,18 +123,125 @@ if (isset($arguments_parsed['import-ragazzi'])) {
         $ragazzo_row->codicecensimento	= $ragazzo->codicesocio;
         $ragazzo_row->nome				= $ragazzo->nome;
         $ragazzo_row->cognome			= $ragazzo->cognome;
-        $ragazzo_row->eta				= 0;
-        $ragazzo_row->idgruppo			= $ragazzo->gruppo;
-        $ragazzo_row->handicap			= 0;
-        $ragazzo_row->novizio			= 0;
 
-        // selettore sulle $ragazzo->strada3
+        $ragazzo_row->eta				= 0; //da ricavare
+
+        $ragazzo_row->idgruppo			= $ragazzo->gruppo;
+
+        $ragazzo_row->novizio			= 0; //da ricavare in base all'eta (16-17)
 
         $ragazzo_row->stradadicoraggio1	= 0;
         $ragazzo_row->stradadicoraggio2	= 0;
         $ragazzo_row->stradadicoraggio3	= 0;
         $ragazzo_row->stradadicoraggio4	= 0;
         $ragazzo_row->stradadicoraggio5	= 0;
+
+        switch($ragazzo->strada1){
+            case 1:
+                $ragazzo_row->stradadicoraggio1	= 1;
+                break;
+            case 2:
+                $ragazzo_row->stradadicoraggio2	= 1;
+                break;
+            case 3:
+                $ragazzo_row->stradadicoraggio3	= 1;
+                break;
+            case 4:
+                $ragazzo_row->stradadicoraggio4	= 1;
+                break;
+            case 5:
+                $ragazzo_row->stradadicoraggio5	= 1;
+                break;
+            default:
+                \cli\out('invalid data strada1 : ' . $ragazzo->strada1 . "\n");
+                exit - 1;
+                break;
+        }
+
+        switch($ragazzo->strada2){
+            case 1:
+                $ragazzo_row->stradadicoraggio1	= 1;
+                break;
+            case 2:
+                $ragazzo_row->stradadicoraggio2	= 1;
+                break;
+            case 3:
+                $ragazzo_row->stradadicoraggio3	= 1;
+                break;
+            case 4:
+                $ragazzo_row->stradadicoraggio4	= 1;
+                break;
+            case 5:
+                $ragazzo_row->stradadicoraggio5	= 1;
+                break;
+            default:
+                \cli\out('invalid data strada2 : ' . $ragazzo->strada2 . "\n");
+                exit - 1;
+                break;
+        }
+
+        switch($ragazzo->strada3){
+            case 1:
+                $ragazzo_row->stradadicoraggio1	= 1;
+                break;
+            case 2:
+                $ragazzo_row->stradadicoraggio2	= 1;
+                break;
+            case 3:
+                $ragazzo_row->stradadicoraggio3	= 1;
+                break;
+            case 4:
+                $ragazzo_row->stradadicoraggio4	= 1;
+                break;
+            case 5:
+                $ragazzo_row->stradadicoraggio5	= 1;
+                break;
+            default:
+                \cli\out('invalid data strada3 : ' . $ragazzo->strada3 . "\n");
+                exit - 1;
+                break;
+        }
+
+
+        $ragazzo_row->colazione = $ragazzo->colazione;
+
+        $ragazzo_row->alimentari = $ragazzo->alimentari;
+
+        if ( $ragazzo->intolleranzealimentari->presenti != 0 ){
+            $ragazzo_row->intolleranzealimentari = $ragazzo->intolleranzealimentari->elenco;
+        } else {
+            $ragazzo_row->intolleranzealimentari = NULL;
+        }
+
+        if ( $ragazzo->allergiealimentari->presenti != 0 ){
+            $ragazzo_row->allergiealimentari = $ragazzo->allergiealimentari->elenco;
+        } else {
+            $ragazzo_row->allergiealimentari = NULL;
+        }
+
+        if ( $ragazzo->allergiefarmaci->presenti != 0 ){
+            $ragazzo_row->allergiefarmaci = $ragazzo->allergiefarmaci->elenco;
+        } else {
+            $ragazzo_row->allergiefarmaci = NULL;
+        }
+
+        if ( $ragazzo->disabilita->presenti != 0 ){
+            $ragazzo_row->sensoriali = $ragazzo->disabilita->sensoriali;
+            $ragazzo_row->psichiche = $ragazzo->disabilita->psichiche;
+            $ragazzo_row->lis = $ragazzo->disabilita->lis;
+            $ragazzo_row->fisiche = $ragazzo->disabilita->fisiche;
+        } else {
+            $ragazzo_row->sensoriali = NULL;
+            $ragazzo_row->psichiche = NULL;
+            $ragazzo_row->lis = NULL;
+            $ragazzo_row->fisiche = NULL;
+        }
+
+        if ( $ragazzo->patologie->presenti != 0 ){
+            $ragazzo_row->patologie = $ragazzo->patologie->descrizione;
+        } else {
+            $ragazzo_row->patologie = NULL;
+        }
 
         $id = R::store($ragazzo_row);
 
