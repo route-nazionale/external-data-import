@@ -13,6 +13,17 @@ require 'config.php';
 use RedBean_Facade as R;
 use Monolog\Logger;
 
+
+function getAge($birthday)
+{
+    $datetime1 = new DateTime($birthday);
+    $datetime2 = new DateTime(date('Y-m-d'));
+    $diff = $datetime1->diff($datetime2);
+
+    return $diff->format('%y');
+}
+
+
 $strict = in_array('--strict', $_SERVER['argv']);
 $arguments = new \cli\Arguments(compact('strict'));
 
@@ -21,6 +32,7 @@ $arguments->addFlag('version', 'Display the version');
 $arguments->addFlag(array('quiet', 'q'), 'Disable all output');
 $arguments->addFlag(array('help', 'h'), 'Show this help screen');
 
+$arguments->addFlag(array('production-mode', 'p'), 'Turn on production mode, default off');
 $arguments->addFlag(array('import-ragazzi', 'r'), 'Turn on import ragazzi');
 $arguments->addFlag(array('import-gruppi', 'g'), 'Turn on import gruppi');
 $arguments->addFlag(array('import-external-lab', 'e'), 'Turn on import external lab');
@@ -76,7 +88,12 @@ $password = $config['db']['password'];
 R::setup($dsn, $username, $password);
 R::freeze(false);
 
-$all = false; //demo mode
+if (isset($arguments_parsed['production-mode'])) {
+    $all = true; //demo mode
+} else {
+    $all = false; //demo mode
+}
+
 $proxy = new \Iscrizioni\ProxyHelper($config['base_url']);
 
 if (isset($arguments_parsed['import-ragazzi']) || isset($arguments_parsed['import-gruppi'])) {
@@ -105,10 +122,10 @@ if (isset($arguments_parsed['import-gruppi'])) {
         $log->addInfo('Gruppo ', array('codice' => $gruppo->codice, 'nome' => $gruppo->nome, 'unita' => $gruppo->unita, 'regione' => $gruppo->regione));
 
         $gruppo_row = R::dispense('gruppi');
-        $gruppo_row->nome 			= $gruppo->nome;
-        $gruppo_row->sottocampo 	= -1;
         $gruppo_row->idgruppo 		= $gruppo->codice;
-        $gruppo_row->gemellaggio 	= -1;
+        $gruppo_row->nome 			= $gruppo->nome;
+        $gruppo_row->unita 			= $gruppo->unita;
+        $gruppo_row->regione 		= $gruppo->regione;
         $id = R::store($gruppo_row);
 
     }
@@ -124,11 +141,32 @@ if (isset($arguments_parsed['import-ragazzi'])) {
         $ragazzo_row->nome				= $ragazzo->nome;
         $ragazzo_row->cognome			= $ragazzo->cognome;
 
-        $ragazzo_row->eta				= 0; //da ricavare
+        $ragazzo_row->sesso             = $ragazzo->sesso;
+
+        $ragazzo_row->datanascita       = $ragazzo->datanascita;
+
+        $eta_ragazzo = getAge($ragazzo->datanascita);//Formato 1988-01-31 YYYY-MM-GG
+        $ragazzo_row->eta				= $eta_ragazzo;
 
         $ragazzo_row->idgruppo			= $ragazzo->gruppo;
+        $ragazzo_row->idunitagruppo     = $ragazzo->unita;
 
-        $ragazzo_row->novizio			= 0; //da ricavare in base all'eta (16-17)
+        switch($eta_ragazzo){
+            case 16:
+            case 17:
+                $ragazzo_row->novizio			= 1; //da ricavare in base all'eta (16-17)
+                break;
+            case 18:
+            case 19:
+            case 20:
+            case 21:
+                $ragazzo_row->novizio			= 0; //da ricavare in base all'eta (16-17)
+                break;
+            default:
+                \cli\out('invalid age : ' . $eta_ragazzo . "\n");
+                exit - 1;
+                break;
+        }
 
         $ragazzo_row->stradadicoraggio1	= 0;
         $ragazzo_row->stradadicoraggio2	= 0;
