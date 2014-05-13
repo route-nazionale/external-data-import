@@ -179,8 +179,9 @@ try {
                         $ragazzo_row->novizio			= 0; //da ricavare in base all'eta (16-17)
                         break;
                     default:
-                        \cli\out('invalid age : ' . $eta_ragazzo . "\n");
-                        exit - 1;
+                        \cli\out('['.$ragazzo->codicesocio.']'.'invalid age : ' . $eta_ragazzo . "\n");
+                        $log->addError('['.$ragazzo->codicesocio.']'.'invalid age : ' . $eta_ragazzo.' nato il '.$ragazzo->datanascita);
+                        $ragazzo_row->novizio			= 0;
                         break;
                 }
 
