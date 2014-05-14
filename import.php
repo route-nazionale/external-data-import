@@ -32,12 +32,16 @@ $arguments->addFlag('version', 'Display the version');
 $arguments->addFlag(array('quiet', 'q'), 'Disable all output');
 $arguments->addFlag(array('help', 'h'), 'Show this help screen');
 
+$arguments->addOption(array('input-file','f'), array(
+    'default' => getcwd().'/resources/${nomefile}.xlxs',
+    'description' => 'Setta il file da caricare'));
+
 $arguments->addFlag(array('production-mode', 'p'), 'Turn on production mode, default off');
-$arguments->addFlag(array('import-ragazzi', 'r'), 'Turn on import ragazzi');
-$arguments->addFlag(array('import-gruppi', 'g'), 'Turn on import gruppi');
-$arguments->addFlag(array('import-external-lab', 'e'), 'Turn on import external lab');
-$arguments->addFlag(array('import-internal-lab', 'i'), 'Turn on import internal lab');
-$arguments->addFlag(array('import-subarea', 's'), 'Turn on import sub area');
+$arguments->addFlag(array('import-ragazzi', 'r'), 'Turn on import ragazzi [API]');
+$arguments->addFlag(array('import-gruppi', 'g'), 'Turn on import gruppi [API]');
+$arguments->addFlag(array('import-external-lab', 'e'), 'Turn on import external lab [FILE]');
+$arguments->addFlag(array('import-internal-lab', 'i'), 'Turn on import internal lab [FILE]');
+$arguments->addFlag(array('import-subarea', 's'), 'Turn on import sub area [FILE]');
 
 $arguments->parse();
 if ($arguments['help']) {
@@ -94,6 +98,11 @@ try {
         $all = true; //demo mode
     } else {
         $all = false; //demo mode
+    }
+
+
+    if (isset($arguments_parsed['input-file'])) {
+        $filename = $arguments_parsed['input-file'];
     }
 
     $proxy = new \Iscrizioni\ProxyHelper($config['base_url']);
@@ -308,6 +317,10 @@ try {
     if (isset($arguments_parsed['import-internal-lab'])) {
 
         $inputFileName = 'interni.xlsx';
+        if ( !empty($filename) ){
+            $inputFileName = $filename;
+        }
+
         //  Read your Excel workbook
         try {
             $inputFileType = PHPExcel_IOFactory::identify($inputFileName);
@@ -320,15 +333,79 @@ try {
         //  Get worksheet dimensions
         $sheet = $objPHPExcel->getSheet(0);
         $highestRow = $sheet->getHighestRow();
-        $highestColumn = $sheet->getHighestColumn();
+        //$highestColumn = $sheet->getHighestColumn();
 
         //  Loop through each row of the worksheet in turn
-        for ($row = 1; $row <= $highestRow; $row++) {
+        for ($row_i = 2; $row_i <= $highestRow; $row_i++) { //skip riga 1
             try {
-                //  Read a row of data into an array
-                $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
-                foreach ($rowData[0] as $k => $v)
-                    echo "Row: " . $row . "- Col: " . ($k + 1) . " = " . $v . "\n";
+
+                $rowData = $sheet->rangeToArray('A' . $row_i . ':' . 'AT' . $row_i, NULL, TRUE, FALSE);
+
+
+                /*
+                $rowData = $sheet->rangeToArray('A' . $row_i . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
+                */
+
+                $row = $rowData[0];
+
+                /*
+                foreach ($row as $k => $v){
+                    //echo "Row: " . $row_i . "- Col: " . ($k + 1) . " = " . $v . "\n";
+                }
+                */
+
+
+                if ( !empty($row[2]) ){
+                    $log->addInfo('Lab Interno '.$row_i, array('codicesocio' => $row[2], 'cognome' => $row[3], 'nome' => $row[4] , 'sesso' => $row[5] ));
+
+                    $interni_row = R::dispense('interni');
+                    $interni_row->quota								    = $row[1 ]; //Quota <E2><82><AC>
+                    $interni_row->codicesocio						    = $row[2 ]; //codice_socio
+                    $interni_row->cognome      							= $row[3 ]; //Cognome
+                    $interni_row->nome      							= $row[4 ]; //Nome
+                    $interni_row->sesso      							= $row[5 ]; //Sesso
+                    $interni_row->luogonascita      				    = $row[6 ]; //Luogo_Nasc.
+                    $interni_row->datanascita      						= $row[7 ]; //Data_Nasc.
+                    $interni_row->eta     							    = $row[8 ]; //Eta
+                    $interni_row->indirizzo      						= $row[9 ]; //indirizzo
+                    $interni_row->cap      							    = $row[10]; //cap
+                    $interni_row->residenza      						= $row[11]; //residenza
+                    $interni_row->prov      							= $row[12]; //prov
+                    $interni_row->tel      							    = $row[13]; //tel
+                    $interni_row->cell      							= $row[14]; //cell
+                    $interni_row->email      							= $row[15]; //email
+                    $interni_row->email2      							= $row[16]; //email2
+                    $interni_row->proponente      						= $row[17]; //proponente
+                    $interni_row->stradacoraggio      					= $row[18]; //strada_coraggio
+                    $interni_row->laboratorio      						= $row[19]; //laboratorio
+                    $interni_row->obiettivolab							= $row[20]; //obiettivo_lab
+                    $interni_row->orgoutputfin      					= $row[21]; //org_output_fin
+                    $interni_row->fasciaeta      						= $row[22]; //fascia_eta
+                    $interni_row->materiali      						= $row[23]; //materiali
+                    $interni_row->spedizionemateriali      				= $row[24]; //spedizione_materiali
+                    $interni_row->esigenze      						= $row[25]; //esigenze
+                    $interni_row->pernotto      						= $row[26]; //pernotto
+                    $interni_row->arrivo      							= $row[27]; //arrivo
+
+                    $interni_row->codicesocioaltroanim      			= $row[29]; //Codice_socio_nome_altro_anim
+                    $interni_row->nomealtroanim      				    = $row[30]; //nome_altro_anim
+                    $interni_row->emailaltroanim      					= $row[31]; //e_mail
+                    $interni_row->telefonoaltroanim      				= $row[32]; //telefono
+                    $interni_row->pernottoaltroanim      				= $row[33]; //pernotto_2
+                    $interni_row->arrivoaltroanim     					= $row[34]; //arrivo_2
+                    $interni_row->dataprotocolloaltroanim      			= $row[35]; //Data_Protocollo
+                    $interni_row->nomegruppo      						= $row[36]; //NOMEGRUPPO
+                    $interni_row->nomezona     							= $row[37]; //NOMEZONA
+                    $interni_row->nomereg      							= $row[38]; //NOMEREG
+
+                    $interni_row->alimentazione      					= $row[43]; //SPECIFICHE ALIMENTAZIONE
+                    $interni_row->colazione      						= $row[44]; //SPECIFICHE COLAZIONE (LATTE/T<C3><A8>)
+                    $interni_row->note      							= $row[45]; //NOTE EMI
+
+                    $id = R::store($interni_row);
+
+                }
+
             } catch (Exception $e) {
                 die('Error reading file "' . pathinfo($inputFileName, PATHINFO_BASENAME) . '": ' . $e->getMessage());
             }
@@ -339,6 +416,10 @@ try {
     if (isset($arguments_parsed['import-external-lab'])) {
 
         $inputFileName = 'esterni.xlsx';
+        if ( !empty($filename) ){
+            $inputFileName = $filename;
+        }
+
         //  Read your Excel workbook
         try {
             $inputFileType = PHPExcel_IOFactory::identify($inputFileName);
@@ -351,19 +432,72 @@ try {
         //  Get worksheet dimensions
         $sheet = $objPHPExcel->getSheet(0);
         $highestRow = $sheet->getHighestRow();
-        $highestColumn = $sheet->getHighestColumn();
+        //$highestColumn = $sheet->getHighestColumn();
 
         //  Loop through each row of the worksheet in turn
-        for ($row = 1; $row <= $highestRow; $row++) {
+        for ($row_i = 2; $row_i <= $highestRow; $row_i++) { //skip prima riga
             try {
+
                 //  Read a row of data into an array
-                $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
-                foreach ($rowData[0] as $k => $v)
-                    echo "Row: " . $row . "- Col: " . ($k + 1) . " = " . $v . "\n";
+                $rowData = $sheet->rangeToArray('A' . $row_i . ':' . 'AI' . $row_i, NULL, TRUE, FALSE);
+
+                $row = $rowData[0];
+
+                if ( !empty($row[4]) ){
+                    $log->addInfo('Lab Esterno '.$row_i, array('titolo' => $row[4], 'aec' => $row[2], 'codicesocio' => $row[13] , 'email' => $row[16] ));
+
+                    $esterni_row = R::dispense('esterni');
+                    $esterni_row->cronologia							= $row[0 ];									//Informazioni cronologiche
+                    $esterni_row->regione								= $row[1 ];									//Regione di appartenenza
+                    $esterni_row->aec									= $row[2 ];									//Associazione/Ente/Cooperativa<E2><80><A6>proponente
+                    $esterni_row->stradacoraggio						= $row[3 ];									//Strada di Coraggio
+                    $esterni_row->titolo								= $row[4 ];									//Titolo laboratorio
+                    $esterni_row->obiettivo								= $row[5 ];									//Obiettivo
+                    $esterni_row->info									= $row[6 ];									//Organizzazione/struttura del laboratorio ed eventuale output finale prodotto
+                    $esterni_row->limiti								= $row[7 ];									//Laboratorio adatto a ragazzi di:
+                    $esterni_row->materiali								= $row[8 ];									//Materiali propri utilizzati
+
+                    $esterni_row->esigenze								= $row[10];									// Eventuali esigenze particolari
+
+                    $esterni_row->quota									= $row[12];									// Quota <E2><82><AC>
+                    $esterni_row->codicesocio							= $row[13];									// codice socio
+                    $esterni_row->nome									= $row[14];									// Nome
+                    $esterni_row->cognome								= $row[15];									// Cognome
+                    $esterni_row->email									= $row[16];									// E-mail
+                    $esterni_row->telefono								= $row[17];									// Telefono/Cell
+                    $esterni_row->pernotto								= $row[18];									// Pernottamento in
+                    $esterni_row->dlgs196								= $row[19];									// Autorizzo il trattamento dei miei dati personali ai sensi del Dlgs 196 del 30 giugno 2003.
+                    $esterni_row->altroanim								= $row[20];									// C'<C3><A8> un altro animatore?
+
+                    $esterni_row->codicesocioaltroanim					= $row[22];									// codice socio
+                    $esterni_row->nomealtroanim							= $row[23];									// Nome
+                    $esterni_row->cognomealtroanim						= $row[24];									// Cognome
+                    $esterni_row->emailaltroanim						= $row[25];									// E-mail
+                    $esterni_row->telefonoaltroanim						= $row[26];									// Telefono/Cell
+                    $esterni_row->pernottoaltroanim						= $row[27];									// Pernottamento in
+                    $esterni_row->dlgs196altroanim						= $row[28];									// Autorizzo il trattamento dei miei dati personali ai sensi del Dlgs 196 del 30 giugno 2003.
+                    $esterni_row->note									= $row[29];									// NOTE PER SEGRETERIA
+
+                    $esterni_row->alloggio								= $row[31];									// SPECIFICHE ALLOGGIO
+
+                    $esterni_row->colazione								= $row[33];									// SPECIFICHE COLAZIONE (Latte/Tea)
+                    $esterni_row->note2									= $row[34];									// NOTE PER AREA EVENTI
+
+                    $id = R::store($esterni_row);
+
+                    /*
+                    foreach ($rowData[0] as $k => $v)
+                        echo "Row: " . $row . "- Col: " . ($k) . " = " . $v . "\n";
+                    */
+                }
+
             } catch (Exception $e) {
                 die('Error reading file "' . pathinfo($inputFileName, PATHINFO_BASENAME) . '": ' . $e->getMessage());
             }
         }
+        /*
+         *
+        */
 
     }
 
