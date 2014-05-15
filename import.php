@@ -154,6 +154,8 @@ try {
 
             $capi = $proxy->getCapi($i,50);
 
+            //echo count($capi)."\n";
+
             if ($all) {
                 $capi_estratti = count($capi);
                 $i += $capi_estratti;
@@ -181,17 +183,24 @@ try {
                 $capo_row->sesso             = $capo->sesso;
 
                 $recapiti = $capo->recapiti;
+
                 foreach($recapiti as $recapito) {
-                    $log->addInfo("\t".'Recapito ', array('tipo' => $recapito->tipo, 'valore' => $recapito->valore));
-                    if ( $recapito->tipo == 'email' ){
-                        $capo_row->email = $recapito->valore;
+
+                    if  ( !is_null($recapito->tipo)) {
+
+                        $log->addInfo("\t".'Recapito ', array('tipo' => $recapito->tipo, 'valore' => $recapito->valore));
+                        if ( $recapito->tipo == 'email' ){
+                            $capo_row->email = $recapito->valore;
+                        }
+                        if ( $recapito->tipo == 'cellulare' ) {
+                            $capo_row->cellulare = $recapito->valore;
+                        }
+                        if ( $recapito->tipo == 'abitazione' ) {
+                            if  ( is_numeric($recapito->valore) ) $capo_row->abitazione = $recapito->valore;
+                        }
+
                     }
-                    if ( $recapito->tipo == 'cellulare' ) {
-                        $capo_row->cellulare = $recapito->valore;
-                    }
-                    if ( $recapito->tipo == 'abitazione' ) {
-                        $capo_row->abitazione = $recapito->valore;
-                    }
+
                 }
 
                 $residenza = $capo->residenza;
@@ -267,6 +276,7 @@ try {
             }
 
             foreach ($ragazzi as $ragazzo) {
+
                 $log->addInfo('Ragazzo ', array('codicesocio' => $ragazzo->codicesocio, 'gruppo' => $ragazzo->gruppo, 'unita' => $ragazzo->unita, 'strada1' => $ragazzo->strada1, 'strada2' => $ragazzo->strada2, 'strada3' => $ragazzo->strada3));
 
                 $ragazzo_row = R::dispense('ragazzo');
