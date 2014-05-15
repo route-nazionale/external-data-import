@@ -42,6 +42,7 @@ $arguments->addFlag(array('import-gruppi', 'g'), 'Turn on import gruppi [API]');
 $arguments->addFlag(array('import-external-lab', 'e'), 'Turn on import external lab [FILE]');
 $arguments->addFlag(array('import-internal-lab', 'i'), 'Turn on import internal lab [FILE]');
 $arguments->addFlag(array('import-subarea', 's'), 'Turn on import sub area [FILE]');
+$arguments->addFlag(array('import-route', 'u'), 'Turn on import route definition [FILE]');
 
 $arguments->parse();
 if ($arguments['help']) {
@@ -543,6 +544,70 @@ try {
                     $id = R::store($quartiere_row);
                 }
 
+                /*
+                foreach ($rowData[0] as $k => $v)
+                    echo "Row: " . $row_i . "- Col: " . ($k) . " = " . $v . "\n";
+                */
+
+            } catch (Exception $e) {
+                die('Error reading file "' . pathinfo($inputFileName, PATHINFO_BASENAME) . '": ' . $e->getMessage());
+            }
+        }
+
+    }
+
+    if (isset($arguments_parsed['import-route'])) {
+
+        $inputFileName = 'route.ods';
+        if ( !empty($filename) ){
+            $inputFileName = $filename;
+        }
+
+        //  Read your Excel workbook
+        try {
+            $inputFileType = PHPExcel_IOFactory::identify($inputFileName);
+            $objReader = PHPExcel_IOFactory::createReader($inputFileType);
+            $objPHPExcel = $objReader->load($inputFileName);
+        } catch (Exception $e) {
+            die('Error loading file "' . pathinfo($inputFileName, PATHINFO_BASENAME) . '": ' . $e->getMessage());
+        }
+
+        //  Get worksheet dimensions
+        $sheet = $objPHPExcel->getSheet(0);
+        $highestRow = $sheet->getHighestRow();
+        //$highestColumn = $sheet->getHighestColumn();
+
+        //  Loop through each row of the worksheet in turn
+        for ($row_i = 2; $row_i <= $highestRow; $row_i++) { //skip prima riga
+            try {
+
+                //  Read a row of data into an array
+                $rowData = $sheet->rangeToArray('A' . $row_i . ':' . 'P' . $row_i, NULL, TRUE, FALSE);
+
+                $row = $rowData[0];
+
+                $log->addInfo('Route Definition '.$row_i, array('route' => $row[1], 'idgruppo' => $row[5], 'idunita' => $row[6]));
+
+                $gemellaggio_row = R::dispense('gemellaggio');
+                $gemellaggio_row->area			     = $row[0 ];   // area
+
+                $route_number = str_replace('Route ','',$row[1]);
+                $gemellaggio_row->route			     = intval($route_number,10);	//Route
+
+                $gemellaggio_row->codicesocio	     = $row[2];    // codice_socio
+                $gemellaggio_row->regione			 = $row[3];    // Regione_dove_svolge_servizio
+                $gemellaggio_row->gruppo			 = $row[4];    // Gruppo_dove_svolge_servizio
+                $gemellaggio_row->idgruppo		     = $row[5];    // ordinale gruppo dove svolge servizio
+                $gemellaggio_row->idunita			 = $row[6];    // unita_servizio
+                $gemellaggio_row->cognome			 = $row[7];    // Cognome
+                $gemellaggio_row->nome			     = $row[8];    // Nome
+                $gemellaggio_row->email			     = $row[9];    // e-mail
+                $gemellaggio_row->telefono		     = $row[10];   // Telefono
+                $gemellaggio_row->cell			     = $row[11];   // Cell
+
+                $gemellaggio_row->gemellato			 = $row[14];   // gemellato con FAMOSA COLONNA 0
+
+                $id = R::store($gemellaggio_row);
                 /*
                 foreach ($rowData[0] as $k => $v)
                     echo "Row: " . $row_i . "- Col: " . ($k) . " = " . $v . "\n";

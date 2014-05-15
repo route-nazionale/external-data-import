@@ -14,8 +14,13 @@ Command line
       --quiet, -q                Disable all output
       --help, -h                 Show this help screen
       --production-mode, -p      Turn on production mode, default off
-      --import-ragazzi, -r       Turn on import ragazzi
-      --import-gruppi, -g        Turn on import gruppi
-      --import-external-lab, -e  Turn on import external lab
-      --import-internal-lab, -i  Turn on import internal lab
-      --import-subarea, -s       Turn on import sub area
+      --import-ragazzi, -r       Turn on import ragazzi [API]
+      --import-gruppi, -g        Turn on import gruppi [API]
+      --import-external-lab, -e  Turn on import external lab [FILE]
+      --import-internal-lab, -i  Turn on import internal lab [FILE]
+      --import-subarea, -s       Turn on import sub area [FILE]
+      --import-route, -u         Turn on import route definition [FILE]
+
+    Options
+      --input-file, -f  Setta il file da caricare [default: /Users/yoghi/Documents/Workspace/external-data-import/resources/${nomefile}.xlxs]
+
