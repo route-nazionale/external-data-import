@@ -38,6 +38,8 @@ $arguments->addOption(array('input-file','f'), array(
 
 $arguments->addFlag(array('production-mode', 'p'), 'Turn on production mode, default off');
 $arguments->addFlag(array('import-ragazzi', 'r'), 'Turn on import ragazzi [API]');
+$arguments->addFlag(array('import-capi', 'c'), 'Turn on import capi [API]');
+$arguments->addFlag(array('import-oneteam', 'o'), 'Turn on import oneteam [API]');
 $arguments->addFlag(array('import-gruppi', 'g'), 'Turn on import gruppi [API]');
 $arguments->addFlag(array('import-external-lab', 'e'), 'Turn on import external lab [FILE]');
 $arguments->addFlag(array('import-internal-lab', 'i'), 'Turn on import internal lab [FILE]');
@@ -108,7 +110,7 @@ try {
 
     $proxy = new \Iscrizioni\ProxyHelper($config['base_url']);
 
-    if (isset($arguments_parsed['import-ragazzi']) || isset($arguments_parsed['import-gruppi'])) {
+    if (isset($arguments_parsed['import-ragazzi']) || isset($arguments_parsed['import-oneteam']) || isset($arguments_parsed['import-capi']) || isset($arguments_parsed['import-gruppi'])) {
 
         if (!(file_exists($config['key_path']))) {
             \cli\out('invalid private key : ' . $config['key_path'] . "\n");
@@ -126,6 +128,7 @@ try {
 
     }
 
+
     if (isset($arguments_parsed['import-gruppi'])) {
 
         $gruppi = $proxy->getGruppi($all);
@@ -141,6 +144,110 @@ try {
             $id = R::store($gruppo_row);
 
         }
+    }
+
+    if (isset($arguments_parsed['import-capi'])) {
+
+        $i = 0;
+        $running = true;
+        while($running){
+
+            $capi = $proxy->getCapi($i,50);
+
+            if ($all) {
+                $capi_estratti = count($capi);
+                $i += $capi_estratti;
+                if ( $capi_estratti < 50 ) $running = false;
+            } else {
+                $running = false;
+            }
+
+            foreach ($capi as $capo) {
+
+                $log->addInfo('Capo ', array('codicesocio' => $capo->codicesocio, 'gruppo' => $capo->gruppo, 'unita' => $capo->unita));
+
+                $capo_row = R::dispense('capo');
+                $capo_row->codicecensimento	= $capo->codicesocio;
+                $capo_row->nome				= $capo->nome;
+                $capo_row->cognome			= $capo->cognome;
+                $capo_row->idgruppo			= $capo->gruppo;
+                $capo_row->idunitagruppo     = $capo->unita;
+
+                $capo_row->datanascita       = $capo->datanascita;
+
+                $eta_capo = getAge($capo->datanascita);//Formato 1988-01-31 YYYY-MM-GG
+                $capo_row->eta				= $eta_capo;
+
+                $capo_row->sesso             = $capo->sesso;
+
+                $recapiti = $capo->recapiti;
+                foreach($recapiti as $recapito) {
+                    $log->addInfo("\t".'Recapito ', array('tipo' => $recapito->tipo, 'valore' => $recapito->valore));
+                    if ( $recapito->tipo == 'email' ){
+                        $capo_row->email = $recapito->valore;
+                    }
+                    if ( $recapito->tipo == 'cellulare' ) {
+                        $capo_row->cellulare = $recapito->valore;
+                    }
+                    if ( $recapito->tipo == 'abitazione' ) {
+                        $capo_row->abitazione = $recapito->valore;
+                    }
+                }
+
+                $residenza = $capo->residenza;
+                $log->addInfo("\t".'Residenza', array('citta' => $residenza->citta));
+                $capo_row->indirizzo    = $residenza->indirizzo;
+                $capo_row->cap          = $residenza->cap;
+                $capo_row->citta        = $residenza->citta;
+                $capo_row->provincia    = $residenza->provincia;
+
+                $capo_row->ruolo = $capo->ruolo;
+
+                $capo_row->colazione = $capo->colazione;
+
+                $capo_row->alimentari = $capo->alimentari;
+
+                if ( $capo->intolleranzealimentari->presenti != 0 ){
+                    $capo_row->intolleranzealimentari = $capo->intolleranzealimentari->elenco;
+                } else {
+                    $capo_row->intolleranzealimentari = NULL;
+                }
+
+                if ( $capo->allergiealimentari->presenti != 0 ){
+                    $capo_row->allergiealimentari = $capo->allergiealimentari->elenco;
+                } else {
+                    $capo_row->allergiealimentari = NULL;
+                }
+
+                if ( $capo->allergiefarmaci->presenti != 0 ){
+                    $capo_row->allergiefarmaci = $capo->allergiefarmaci->elenco;
+                } else {
+                    $capo_row->allergiefarmaci = NULL;
+                }
+
+                if ( $capo->disabilita->presenti != 0 ){
+                    $capo_row->sensoriali = $capo->disabilita->sensoriali;
+                    $capo_row->psichiche = $capo->disabilita->psichiche;
+                    $capo_row->lis = $capo->disabilita->lis;
+                    $capo_row->fisiche = $capo->disabilita->fisiche;
+                } else {
+                    $capo_row->sensoriali = NULL;
+                    $capo_row->psichiche = NULL;
+                    $capo_row->lis = NULL;
+                    $capo_row->fisiche = NULL;
+                }
+
+                if ( $capo->patologie->presenti != 0 ){
+                    $capo_row->patologie = $capo->patologie->descrizione;
+                } else {
+                    $capo_row->patologie = NULL;
+                }
+
+                $id = R::store($capo_row);
+
+            }
+        }
+
     }
 
     if (isset($arguments_parsed['import-ragazzi'])) {
@@ -178,6 +285,7 @@ try {
                 $ragazzo_row->idunitagruppo     = $ragazzo->unita;
 
                 switch($eta_ragazzo){
+                    case 14:
                     case 15:
                     case 16:
                     case 17:

@@ -87,17 +87,48 @@ class ProxyHelper {
 
         $ragazzi_totali = array();
 
-        $ragazzi_totali = array_merge($ragazzi_totali,$ragazzi[0]->partecipanti);
+        if ( count($ragazzi[0]->partecipanti[0]) > 0 ) {
+            $ragazzi_totali = array_merge($ragazzi_totali,$ragazzi[0]->partecipanti);
+        }
 
         $i = count($ragazzi_totali);
         while ( $ragazzi[0]->other == 'ok' && $i < $length ) {
             $response = file_get_contents($this->baseUrl.'/getRagazzi/start/'.$i.'/token/'.$this->currentToken);
             $ragazzi = json_decode($this->decodeAES($response));
-            $ragazzi_totali = array_merge($ragazzi_totali,$ragazzi[0]->partecipanti);
+
+            if ( count($ragazzi[0]->partecipanti[0]) > 0 ) {
+                $ragazzi_totali = array_merge($ragazzi_totali,$ragazzi[0]->partecipanti);
+            }
+
             $i = count($ragazzi_totali);
         }
 
         return $ragazzi_totali;
+    }
+
+    public function getCapi($from,$length){
+        $response = file_get_contents($this->baseUrl.'/getCapi/start/'.$from.'/token/'.$this->currentToken);
+        $capi = json_decode($this->decodeAES($response));
+
+        $capi_totali = array();
+
+        if ( count($capi[0]->partecipanti[0]) > 0 ) {
+            $capi_totali = array_merge($capi_totali,$capi[0]->partecipanti);
+        }
+
+        $i = count($capi_totali);
+        while ( $capi[0]->other == 'ok' && $i < $length ) {
+            $response = file_get_contents($this->baseUrl.'/getCapi/start/'.$i.'/token/'.$this->currentToken);
+            $capi = json_decode($this->decodeAES($response));
+
+            if ( count($capi[0]->partecipanti[0]) > 0 ) {
+                $capi_totali = array_merge($capi_totali,$capi[0]->partecipanti);
+            }
+
+            $i = count($capi_totali);
+        }
+
+        return $capi_totali;
     }
 
     public function setPrivateKey($pkey) {
