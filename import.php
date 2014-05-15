@@ -501,38 +501,57 @@ try {
 
     }
 
-
     if (isset($arguments_parsed['import-subarea'])) {
 
-        /*
-        // QUARTIERI
-            $Reader = new SpreadsheetReader('quartieri.xlsx');
-            $Sheets = $Reader -> Sheets();
+        $inputFileName = 'quartieri.xlsx';
+        if ( !empty($filename) ){
+            $inputFileName = $filename;
+        }
 
-            $Reader -> ChangeSheet(0);
+        //  Read your Excel workbook
+        try {
+            $inputFileType = PHPExcel_IOFactory::identify($inputFileName);
+            $objReader = PHPExcel_IOFactory::createReader($inputFileType);
+            $objPHPExcel = $objReader->load($inputFileName);
+        } catch (Exception $e) {
+            die('Error loading file "' . pathinfo($inputFileName, PATHINFO_BASENAME) . '": ' . $e->getMessage());
+        }
 
-            $totale_sottocampo = array();
+        //  Get worksheet dimensions
+        $sheet = $objPHPExcel->getSheet(0);
+        $highestRow = $sheet->getHighestRow();
+        //$highestColumn = $sheet->getHighestColumn();
 
-            foreach ($Reader as $Row)
-            {
-                //$quartiere_row = R::dispense('quartiere');
-                $quartiere_row = new \stdClass;
-                if (!empty($Row[0]) && is_numeric($Row[0]) ) {
-                    $quartiere_row->sottocampo      = intval($Row[0]);
-                    $quartiere_row->gemellaggio     = intval(str_replace('Route ','',$Row[1]));  // IN STAMPA DEVE AVER IL FORMATO 3 CIFRE str_pad($input, 3, '0', STR_PAD_LEFT);
-                    $quartiere_row->totale          = intval($Row[22]);
-                    if ( isset($totale_sottocampo[$quartiere_row->sottocampo]) ) {
-                        $totale_sottocampo[$quartiere_row->sottocampo] = $totale_sottocampo[$quartiere_row->sottocampo] + $quartiere_row->totale;
-                    } else {
-                        $totale_sottocampo[$quartiere_row->sottocampo] = array();
-                        $totale_sottocampo[$quartiere_row->sottocampo] = $quartiere_row->totale;
-                    }
-                    //var_dump($quartiere_row);
+        //  Loop through each row of the worksheet in turn
+        for ($row_i = 5; $row_i <= $highestRow; $row_i++) { //skip prima riga
+            try {
+
+                //  Read a row of data into an array
+                $rowData = $sheet->rangeToArray('A' . $row_i . ':' . 'X' . $row_i, NULL, TRUE, FALSE);
+
+                $row = $rowData[0];
+
+                if ( !empty($row[0]) ){
+                    $log->addInfo('Quartiere '.$row_i, array('quartiere' => $row[0], 'aec' => $row[2], 'route' => $row[1]));
+
+                    $quartiere_row = R::dispense('quartiere');
+                    $quartiere_row->quartiere	  = $row[0];	//Quartiere
+
+                    $route_number = str_replace('Route ','',$row[1]);
+
+                    $quartiere_row->route	  = intval($route_number,10);	//Route
+                    $id = R::store($quartiere_row);
                 }
-            }
 
-            print_r($totale_sottocampo);
-        */
+                /*
+                foreach ($rowData[0] as $k => $v)
+                    echo "Row: " . $row_i . "- Col: " . ($k) . " = " . $v . "\n";
+                */
+
+            } catch (Exception $e) {
+                die('Error reading file "' . pathinfo($inputFileName, PATHINFO_BASENAME) . '": ' . $e->getMessage());
+            }
+        }
 
     }
 
