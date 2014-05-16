@@ -33,7 +33,7 @@ class ProxyHelper {
 
     public function login($user,$password)
     {
-        $response = file_get_contents($this->baseUrl.'/login2/u/'.$user.'/p/'.$password);
+        $response = $this->remoteCall($this->baseUrl.'/login2/u/'.$user.'/p/'.$password);
 
         $token_json = json_decode($this->decodeRSA($response));
 
@@ -48,7 +48,7 @@ class ProxyHelper {
 
     public function aesSetup()
     {
-        $response = file_get_contents($this->baseUrl.'/getChiave/t/'.$this->currentToken);
+        $response = $this->remoteCall($this->baseUrl.'/getChiave/t/'.$this->currentToken);
 
         $aes_json = json_decode($this->decodeRSA($response));
 
@@ -62,7 +62,7 @@ class ProxyHelper {
     }
 
     public function getGruppi($all = false){
-        $response = file_get_contents($this->baseUrl.'/getGruppi/start/0/token/'.$this->currentToken);
+        $response = $this->remoteCall($this->baseUrl.'/getGruppi/start/0/token/'.$this->currentToken);
         $gruppi = json_decode($this->decodeAES($response));
 
         $gruppi_totali = array();
@@ -72,7 +72,7 @@ class ProxyHelper {
         $i = count($gruppi_totali);
         while ( $all && $gruppi[0]->other == 'ok' ) {
             echo $i."\n";
-            $response = file_get_contents($this->baseUrl.'/getGruppi/start/'.$i.'/token/'.$this->currentToken);
+            $response = $this->remoteCall($this->baseUrl.'/getGruppi/start/'.$i.'/token/'.$this->currentToken);
             $gruppi = json_decode($this->decodeAES($response));
             $gruppi_totali = array_merge($gruppi_totali,$gruppi[0]->gruppi);
             $i = count($gruppi_totali);
@@ -82,7 +82,7 @@ class ProxyHelper {
     }
 
     public function getRagazzi($from,$length){
-        $response = file_get_contents($this->baseUrl.'/getRagazzi/start/'.$from.'/token/'.$this->currentToken);
+        $response = $this->remoteCall($this->baseUrl.'/getRagazzi/start/'.$from.'/token/'.$this->currentToken);
         $ragazzi = json_decode($this->decodeAES($response));
 
         $ragazzi_totali = array();
@@ -93,7 +93,8 @@ class ProxyHelper {
 
         $i = count($ragazzi_totali);
         while ( $ragazzi[0]->other == 'ok' && $i < $length ) {
-            $response = file_get_contents($this->baseUrl.'/getRagazzi/start/'.$i.'/token/'.$this->currentToken);
+            $x = $from + $i;
+            $response = $this->remoteCall($this->baseUrl.'/getRagazzi/start/'.$x.'/token/'.$this->currentToken);
             $ragazzi = json_decode($this->decodeAES($response));
 
             if ( count($ragazzi[0]->partecipanti[0]) > 0 ) {
@@ -103,11 +104,13 @@ class ProxyHelper {
             $i = count($ragazzi_totali);
         }
 
+        $this->log->addDebug('Downloaded '.$i);
+
         return $ragazzi_totali;
     }
 
     public function getCapi($from,$length){
-        $response = file_get_contents($this->baseUrl.'/getCapi/start/'.$from.'/token/'.$this->currentToken);
+        $response = $this->remoteCall($this->baseUrl.'/getCapi/start/'.$from.'/token/'.$this->currentToken);
         $capi = json_decode($this->decodeAES($response));
 
         $capi_totali = array();
@@ -118,7 +121,7 @@ class ProxyHelper {
 
         $i = count($capi_totali);
         while ( $capi[0]->other == 'ok' && $i < $length ) {
-            $response = file_get_contents($this->baseUrl.'/getCapi/start/'.$i.'/token/'.$this->currentToken);
+            $response = $this->remoteCall($this->baseUrl.'/getCapi/start/'.$i.'/token/'.$this->currentToken);
             $capi = json_decode($this->decodeAES($response));
 
             if ( count($capi[0]->partecipanti[0]) > 0 ) {
@@ -133,6 +136,14 @@ class ProxyHelper {
 
     public function setPrivateKey($pkey) {
         $this->privateKey = $pkey;
+    }
+
+    private function remoteCall($url){
+
+        $this->log->addInfo('Call '.$url);
+
+        $response = file_get_contents($url);
+        return $response;
     }
 
     private function decodeAES($testo){

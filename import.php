@@ -152,21 +152,21 @@ try {
         $running = true;
         while($running){
 
-            $capi = $proxy->getCapi($i,50);
+            $capi = $proxy->getCapi($i,10);
 
             //echo count($capi)."\n";
 
             if ($all) {
                 $capi_estratti = count($capi);
                 $i += $capi_estratti;
-                if ( $capi_estratti < 50 ) $running = false;
+                if ( $capi_estratti < 10 ) $running = false;
             } else {
                 $running = false;
             }
 
             foreach ($capi as $capo) {
 
-                $log->addInfo('Capo ', array('codicesocio' => $capo->codicesocio, 'gruppo' => $capo->gruppo, 'unita' => $capo->unita));
+                $log->addInfo('Capo ', json_decode(json_encode($capo), true) );
 
                 $capo_row = R::dispense('capo');
                 $capo_row->codicecensimento	= $capo->codicesocio;
@@ -265,19 +265,19 @@ try {
         $running = true;
         while($running){
 
-            $ragazzi = $proxy->getRagazzi($i,50);
+            $ragazzi = $proxy->getRagazzi($i,20);
 
             if ($all) {
                 $ragazzi_estratti = count($ragazzi);
                 $i += $ragazzi_estratti;
-                if ( $ragazzi_estratti < 50 ) $running = false;
+                if ( $ragazzi_estratti < 10 ) $running = false;
             } else {
                 $running = false;
             }
 
             foreach ($ragazzi as $ragazzo) {
 
-                $log->addInfo('Ragazzo ', array('codicesocio' => $ragazzo->codicesocio, 'gruppo' => $ragazzo->gruppo, 'unita' => $ragazzo->unita, 'strada1' => $ragazzo->strada1, 'strada2' => $ragazzo->strada2, 'strada3' => $ragazzo->strada3));
+                $log->addInfo('Ragazzo ', json_decode(json_encode($ragazzo), true) );
 
                 $ragazzo_row = R::dispense('ragazzo');
                 $ragazzo_row->codicecensimento	= $ragazzo->codicesocio;
@@ -427,7 +427,7 @@ try {
                     $ragazzo_row->patologie = NULL;
                 }
 
-                $id = R::store($ragazzo_row);
+                //  $id = R::store($ragazzo_row);
 
             }
         }
