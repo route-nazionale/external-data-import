@@ -82,6 +82,7 @@ class ProxyHelper {
     }
 
     public function getRagazzi($from,$length){
+        /*
         $response = $this->remoteCall($this->baseUrl.'/getRagazzi/start/'.$from.'/token/'.$this->currentToken);
         $ragazzi = json_decode($this->decodeAES($response));
 
@@ -107,9 +108,12 @@ class ProxyHelper {
         $this->log->addDebug('Downloaded '.$i);
 
         return $ragazzi_totali;
+        */
+        return $this->remote_totali($from,$length,'getRagazzi');
     }
 
     public function getCapi($from,$length){
+        /*
         $response = $this->remoteCall($this->baseUrl.'/getCapi/start/'.$from.'/token/'.$this->currentToken);
         $capi = json_decode($this->decodeAES($response));
 
@@ -134,6 +138,20 @@ class ProxyHelper {
         }
 
         return $capi_totali;
+        */
+        return $this->remote_totali($from,$length,'getCapi');
+    }
+
+    public function getCapiExtra($from,$length){
+        return $this->remote_totali($from,$length,'getCapiExtra');
+    }
+
+    public function getCapiOneTeam($from,$length){
+        return $this->remote_totali($from,$length,'getCapiOneTeam');
+    }
+
+    public function getCapiLaboratorio($from,$length){
+        return $this->remote_totali($from,$length,'getCapiLaboratori');
     }
 
     public function setPrivateKey($pkey) {
@@ -146,6 +164,36 @@ class ProxyHelper {
 
         $response = file_get_contents($url);
         return $response;
+    }
+
+    private function remote_totali($from,$length,$getter){
+
+        $response = $this->remoteCall($this->baseUrl.'/'.$getter.'/start/'.$from.'/token/'.$this->currentToken);
+        $remoteObjects = json_decode($this->decodeAES($response));
+
+        $remote_totali = array();
+
+        if ( count($remoteObjects[0]->partecipanti[0]) > 0 ) {
+            $remote_totali = array_merge($remote_totali,$remoteObjects[0]->partecipanti);
+        }
+
+        $i = count($remote_totali);
+        while ( $remoteObjects[0]->other == 'ok' && $i < $length ) {
+
+            $x = $from + $i;
+            $response = $this->remoteCall($this->baseUrl.'/'.$getter.'/start/'.$x.'/token/'.$this->currentToken);
+            $remoteObjects = json_decode($this->decodeAES($response));
+
+            if ( count($remoteObjects[0]->partecipanti[0]) > 0 ) {
+                $remote_totali = array_merge($remote_totali,$remoteObjects[0]->partecipanti);
+            }
+
+            $i = count($remote_totali);
+        }
+
+        return $remote_totali;
+
+
     }
 
     private function decodeAES($testo){

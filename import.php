@@ -39,6 +39,8 @@ $arguments->addOption(array('input-file','f'), array(
 $arguments->addFlag(array('production-mode', 'p'), 'Turn on production mode, default off');
 $arguments->addFlag(array('import-ragazzi', 'r'), 'Turn on import ragazzi [API]');
 $arguments->addFlag(array('import-capi', 'c'), 'Turn on import capi [API]');
+$arguments->addFlag(array('import-capolaboratorio', 'l'), 'Turn on import capi laboratorio [API]');
+$arguments->addFlag(array('import-extra', 'x'), 'Turn on import capi extra [API]');
 $arguments->addFlag(array('import-oneteam', 'o'), 'Turn on import oneteam [API]');
 $arguments->addFlag(array('import-gruppi', 'g'), 'Turn on import gruppi [API]');
 $arguments->addFlag(array('import-external-lab', 'e'), 'Turn on import external lab [FILE]');
@@ -110,7 +112,7 @@ try {
 
     $proxy = new \Iscrizioni\ProxyHelper($config['base_url']);
 
-    if (isset($arguments_parsed['import-ragazzi']) || isset($arguments_parsed['import-oneteam']) || isset($arguments_parsed['import-capi']) || isset($arguments_parsed['import-gruppi'])) {
+    if (isset($arguments_parsed['import-ragazzi']) || isset($arguments_parsed['import-oneteam']) || isset($arguments_parsed['import-extra']) || isset($arguments_parsed['import-capolaboratorio']) || isset($arguments_parsed['import-capi']) || isset($arguments_parsed['import-gruppi'])) {
 
         if (!(file_exists($config['key_path']))) {
             \cli\out('invalid private key : ' . $config['key_path'] . "\n");
@@ -144,6 +146,258 @@ try {
             $id = R::store($gruppo_row);
 
         }
+    }
+
+    if (isset($arguments_parsed['import-oneteam'])) {
+
+        $i = 0;
+        $running = true;
+        while($running){
+
+            $capiOne = $proxy->getCapiOneTeam($i,10);
+
+            if ($all) {
+                $capi_estratti = count($capiOne);
+                $i += $capi_estratti;
+                if ( $capi_estratti < 10 ) $running = false;
+            } else {
+                $running = false;
+            }
+
+            foreach ($capiOne as $capoOne) {
+
+                $log->addInfo('Capo One Team ', json_decode(json_encode($capoOne), true) );
+
+                $oneteam_row = R::dispense('oneteam');
+                $oneteam_row->codicecensimento	= $capoOne->codicesocio;
+                $oneteam_row->nome				= $capoOne->nome;
+                $oneteam_row->cognome			= $capoOne->cognome;
+
+                $oneteam_row->datanascita       = $capoOne->datanascita;
+
+                $eta_capo = getAge($capoOne->datanascita);//Formato 1988-01-31 YYYY-MM-GG
+                $oneteam_row->eta				= $eta_capo;
+
+                $oneteam_row->sesso             = $capoOne->sesso;
+
+                $oneteam_row->periodopartecipazione             = $capoOne->periodopartecipazione;
+
+                $oneteam_row->pagato             = $capoOne->pagato;
+                $oneteam_row->modpagamento             = $capoOne->modpagamento;
+
+                $oneteam_row->colazione = $capoOne->colazione;
+
+                $oneteam_row->alimentari = $capoOne->alimentari;
+
+                if ( $capoOne->intolleranzealimentari->presenti != 0 ){
+                    $oneteam_row->intolleranzealimentari = $capoOne->intolleranzealimentari->elenco;
+                } else {
+                    $oneteam_row->intolleranzealimentari = NULL;
+                }
+
+                if ( $capoOne->allergiealimentari->presenti != 0 ){
+                    $oneteam_row->allergiealimentari = $capoOne->allergiealimentari->elenco;
+                } else {
+                    $oneteam_row->allergiealimentari = NULL;
+                }
+
+                if ( $capoOne->allergiefarmaci->presenti != 0 ){
+                    $oneteam_row->allergiefarmaci = $capoOne->allergiefarmaci->elenco;
+                } else {
+                    $oneteam_row->allergiefarmaci = NULL;
+                }
+
+                if ( $capoOne->disabilita->presenti != 0 ){
+                    $oneteam_row->sensoriali = $capoOne->disabilita->sensoriali;
+                    $oneteam_row->psichiche = $capoOne->disabilita->psichiche;
+                    $oneteam_row->lis = $capoOne->disabilita->lis;
+                    $oneteam_row->fisiche = $capoOne->disabilita->fisiche;
+                } else {
+                    $oneteam_row->sensoriali = NULL;
+                    $oneteam_row->psichiche = NULL;
+                    $oneteam_row->lis = NULL;
+                    $oneteam_row->fisiche = NULL;
+                }
+
+                if ( $capoOne->patologie->presenti != 0 ){
+                    $oneteam_row->patologie = $capoOne->patologie->descrizione;
+                } else {
+                    $oneteam_row->patologie = NULL;
+                }
+
+                $id = R::store($oneteam_row);
+
+            }
+        }
+
+    }
+
+    if (isset($arguments_parsed['import-capolaboratorio'])) {
+
+        $i = 0;
+        $running = true;
+        while($running){
+
+            $capiLaboratorio = $proxy->getCapiLaboratorio($i,10);
+
+            if ($all) {
+                $capi_estratti = count($capiLaboratorio);
+                $i += $capi_estratti;
+                if ( $capi_estratti < 10 ) $running = false;
+            } else {
+                $running = false;
+            }
+
+            foreach ($capiLaboratorio as $capoLaboratorio) {
+
+                $log->addInfo('Capo Laboratorio ', json_decode(json_encode($capoLaboratorio), true) );
+
+                $laboratorio_row = R::dispense('capolaboratorio');
+                $laboratorio_row->codicecensimento	= $capoLaboratorio->codicesocio;
+                $laboratorio_row->nome				= $capoLaboratorio->nome;
+                $laboratorio_row->cognome			= $capoLaboratorio->cognome;
+
+                $laboratorio_row->datanascita       = $capoLaboratorio->datanascita;
+
+                $eta_capo = getAge($capoLaboratorio->datanascita);//Formato 1988-01-31 YYYY-MM-GG
+                $laboratorio_row->eta				= $eta_capo;
+
+                $laboratorio_row->sesso             = $capoLaboratorio->sesso;
+
+                $laboratorio_row->periodopartecipazione             = $capoLaboratorio->periodopartecipazione;
+
+                $laboratorio_row->pagato             = $capoLaboratorio->pagato;
+                $laboratorio_row->modpagamento             = $capoLaboratorio->modpagamento;
+
+                $laboratorio_row->colazione = $capoLaboratorio->colazione;
+
+                $laboratorio_row->alimentari = $capoLaboratorio->alimentari;
+
+                if ( $capoLaboratorio->intolleranzealimentari->presenti != 0 ){
+                    $laboratorio_row->intolleranzealimentari = $capoLaboratorio->intolleranzealimentari->elenco;
+                } else {
+                    $laboratorio_row->intolleranzealimentari = NULL;
+                }
+
+                if ( $capoLaboratorio->allergiealimentari->presenti != 0 ){
+                    $laboratorio_row->allergiealimentari = $capoLaboratorio->allergiealimentari->elenco;
+                } else {
+                    $laboratorio_row->allergiealimentari = NULL;
+                }
+
+                if ( $capoLaboratorio->allergiefarmaci->presenti != 0 ){
+                    $laboratorio_row->allergiefarmaci = $capoLaboratorio->allergiefarmaci->elenco;
+                } else {
+                    $laboratorio_row->allergiefarmaci = NULL;
+                }
+
+                if ( $capoLaboratorio->disabilita->presenti != 0 ){
+                    $laboratorio_row->sensoriali = $capoLaboratorio->disabilita->sensoriali;
+                    $laboratorio_row->psichiche = $capoLaboratorio->disabilita->psichiche;
+                    $laboratorio_row->lis = $capoLaboratorio->disabilita->lis;
+                    $laboratorio_row->fisiche = $capoLaboratorio->disabilita->fisiche;
+                } else {
+                    $laboratorio_row->sensoriali = NULL;
+                    $laboratorio_row->psichiche = NULL;
+                    $laboratorio_row->lis = NULL;
+                    $laboratorio_row->fisiche = NULL;
+                }
+
+                if ( $capoLaboratorio->patologie->presenti != 0 ){
+                    $laboratorio_row->patologie = $capoLaboratorio->patologie->descrizione;
+                } else {
+                    $laboratorio_row->patologie = NULL;
+                }
+
+                $id = R::store($laboratorio_row);
+
+            }
+        }
+
+    }
+
+    if (isset($arguments_parsed['import-extra'])) {
+
+        $i = 0;
+        $running = true;
+        while($running){
+
+            $capiExtra = $proxy->getCapiExtra($i,10);
+
+            if ($all) {
+                $capi_estratti = count($capiExtra);
+                $i += $capi_estratti;
+                if ( $capi_estratti < 10 ) $running = false;
+            } else {
+                $running = false;
+            }
+
+            foreach ($capiExtra as $capoExtra) {
+
+                $log->addInfo('Capo Extra ', json_decode(json_encode($capoExtra), true) );
+
+                $extra_row = R::dispense('capoextra');
+                $extra_row->codicecensimento	= $capoExtra->codicesocio;
+                $extra_row->nome				= $capoExtra->nome;
+                $extra_row->cognome			= $capoExtra->cognome;
+
+                $extra_row->datanascita       = $capoExtra->datanascita;
+
+                $eta_capo = getAge($capoExtra->datanascita);//Formato 1988-01-31 YYYY-MM-GG
+                $extra_row->eta				= $eta_capo;
+
+                $extra_row->sesso             = $capoExtra->sesso;
+
+                $extra_row->periodopartecipazione             = $capoExtra->periodopartecipazione;
+
+                $extra_row->pagato             = $capoExtra->pagato;
+                $extra_row->modpagamento             = $capoExtra->modpagamento;
+
+                $extra_row->colazione = $capoExtra->colazione;
+
+                $extra_row->alimentari = $capoExtra->alimentari;
+
+                if ( $capoExtra->intolleranzealimentari->presenti != 0 ){
+                    $extra_row->intolleranzealimentari = $capoExtra->intolleranzealimentari->elenco;
+                } else {
+                    $extra_row->intolleranzealimentari = NULL;
+                }
+
+                if ( $capoExtra->allergiealimentari->presenti != 0 ){
+                    $extra_row->allergiealimentari = $capoExtra->allergiealimentari->elenco;
+                } else {
+                    $extra_row->allergiealimentari = NULL;
+                }
+
+                if ( $capoExtra->allergiefarmaci->presenti != 0 ){
+                    $extra_row->allergiefarmaci = $capoExtra->allergiefarmaci->elenco;
+                } else {
+                    $extra_row->allergiefarmaci = NULL;
+                }
+
+                if ( $capoExtra->disabilita->presenti != 0 ){
+                    $extra_row->sensoriali = $capoExtra->disabilita->sensoriali;
+                    $extra_row->psichiche = $capoExtra->disabilita->psichiche;
+                    $extra_row->lis = $capoExtra->disabilita->lis;
+                    $extra_row->fisiche = $capoExtra->disabilita->fisiche;
+                } else {
+                    $extra_row->sensoriali = NULL;
+                    $extra_row->psichiche = NULL;
+                    $extra_row->lis = NULL;
+                    $extra_row->fisiche = NULL;
+                }
+
+                if ( $capoExtra->patologie->presenti != 0 ){
+                    $extra_row->patologie = $capoExtra->patologie->descrizione;
+                } else {
+                    $extra_row->patologie = NULL;
+                }
+
+                $id = R::store($extra_row);
+
+            }
+        }
+
     }
 
     if (isset($arguments_parsed['import-capi'])) {
