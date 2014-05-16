@@ -427,7 +427,7 @@ try {
                     $ragazzo_row->patologie = NULL;
                 }
 
-                //  $id = R::store($ragazzo_row);
+                $id = R::store($ragazzo_row);
 
             }
         }
