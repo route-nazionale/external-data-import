@@ -71,8 +71,8 @@ class ProxyHelper {
 
         $i = count($gruppi_totali);
         while ( $all && $gruppi[0]->other == 'ok' ) {
-            echo $i."\n";
-            $response = $this->remoteCall($this->baseUrl.'/getGruppi/start/'.$i.'/token/'.$this->currentToken);
+            $x = $from + $i;
+            $response = $this->remoteCall($this->baseUrl.'/getGruppi/start/'.$x.'/token/'.$this->currentToken);
             $gruppi = json_decode($this->decodeAES($response));
             $gruppi_totali = array_merge($gruppi_totali,$gruppi[0]->gruppi);
             $i = count($gruppi_totali);
@@ -121,7 +121,9 @@ class ProxyHelper {
 
         $i = count($capi_totali);
         while ( $capi[0]->other == 'ok' && $i < $length ) {
-            $response = $this->remoteCall($this->baseUrl.'/getCapi/start/'.$i.'/token/'.$this->currentToken);
+
+            $x = $from + $i;
+            $response = $this->remoteCall($this->baseUrl.'/getCapi/start/'.$x.'/token/'.$this->currentToken);
             $capi = json_decode($this->decodeAES($response));
 
             if ( count($capi[0]->partecipanti[0]) > 0 ) {
