@@ -524,7 +524,11 @@ try {
                     $capo_row->patologie = NULL;
                 }
 
-                $id = R::store($capo_row);
+                try {
+                    $id = R::store($capo_row);
+                } catch(Exception $e){
+                    $log->addError($e->getMessage());
+                }
 
             }
         }
@@ -699,8 +703,12 @@ try {
                     $ragazzo_row->patologie = NULL;
                 }
 
-                $id = R::store($ragazzo_row);
-
+                try {
+                    $id = R::store($ragazzo_row);
+                } catch(Exception $e){
+                    $log->addError($e->getMessage());
+                }
+                
             }
         }
     }
