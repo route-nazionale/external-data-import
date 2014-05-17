@@ -62,7 +62,33 @@ class ProxyHelper {
     }
 
     public function getGruppi($from,$length){
-        return $this->remote_totali($from,$length,'getGruppi');
+
+        $response = $this->remoteCall($this->baseUrl.'/getGruppi/start/'.$from.'/token/'.$this->currentToken);
+        $remoteObjects = json_decode($this->decodeAES($response));
+
+        $remote_totali = array();
+
+        if ( count($remoteObjects[0]->gruppi[0]) > 0 ) {
+            $remote_totali = array_merge($remote_totali,$remoteObjects[0]->partecipanti);
+        }
+
+        $i = count($remote_totali);
+        while ( $remoteObjects[0]->other == 'ok' && $i < $length ) {
+
+            $x = $from + $i;
+            $response = $this->remoteCall($this->baseUrl.'/getGruppi/start/'.$x.'/token/'.$this->currentToken);
+            $remoteObjects = json_decode($this->decodeAES($response));
+
+            if ( count($remoteObjects[0]->gruppi[0]) > 0 ) {
+                $remote_totali = array_merge($remote_totali,$remoteObjects[0]->partecipanti);
+            }
+
+            $i = count($remote_totali);
+        }
+
+        return $remote_totali;
+
+
     }
 
     public function getRagazzi($from,$length){
@@ -123,7 +149,6 @@ class ProxyHelper {
         }
 
         return $remote_totali;
-
 
     }
 
