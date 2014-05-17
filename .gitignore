@@ -25,3 +25,4 @@ config.php
 .idea/workspace.xml
 *.pem
 logs
+.idea

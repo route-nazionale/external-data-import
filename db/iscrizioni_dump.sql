@@ -48,18 +48,18 @@ CREATE TABLE laboratori (
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE tavolerotonde (
-        id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        nome VARCHAR(100) NOT NULL,
-        sottocampo INT NOT NULL,
-        maxpartecipanti INT NOT NULL,
-        minpartecipanti INT NOT NULL,
-        organizzatore VARCHAR(100) NOT NULL,
-        turno1 TINYINT(1) not null default 0,
-        turno2 TINYINT(1) not null default 0,
-        turno3 TINYINT(1) not null default 0,
-        stradadicoraggio1 TINYINT(1) not null default 0,
-        stradadicoraggio2 TINYINT(1) not null default 0,
-        stradadicoraggio3 TINYINT(1) not null default 0,
-        stradadicoraggio4 TINYINT(1) not null default 0,
-        stradadicoraggio5 TINYINT(1) not null default 0
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(100) NOT NULL,
+  sottocampo INT NOT NULL,
+  maxpartecipanti INT NOT NULL,
+  minpartecipanti INT NOT NULL,
+  organizzatore VARCHAR(100) NOT NULL,
+  turno1 TINYINT(1) not null default 0,
+  turno2 TINYINT(1) not null default 0,
+  turno3 TINYINT(1) not null default 0,
+  stradadicoraggio1 TINYINT(1) not null default 0,
+  stradadicoraggio2 TINYINT(1) not null default 0,
+  stradadicoraggio3 TINYINT(1) not null default 0,
+  stradadicoraggio4 TINYINT(1) not null default 0,
+  stradadicoraggio5 TINYINT(1) not null default 0
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
