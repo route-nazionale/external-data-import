@@ -527,7 +527,7 @@ try {
                 try {
                     $id = R::store($capo_row);
                 } catch(Exception $e){
-                    $log->addError($e->getMessage());
+                    $log->addError($e->getMessage(), array('codice socio' => $capo->codicesocio));
                 }
 
             }
@@ -707,7 +707,7 @@ try {
                 try {
                     $id = R::store($ragazzo_row);
                 } catch(Exception $e){
-                    $log->addError($e->getMessage());
+                    $log->addError($e->getMessage(), array('codice socio' => $ragazzo->codicesocio));
                 }
 
             }
