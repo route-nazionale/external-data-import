@@ -61,84 +61,15 @@ class ProxyHelper {
 
     }
 
-    public function getGruppi($all = false){
-        $response = $this->remoteCall($this->baseUrl.'/getGruppi/start/0/token/'.$this->currentToken);
-        $gruppi = json_decode($this->decodeAES($response));
-
-        $gruppi_totali = array();
-
-        $gruppi_totali = array_merge($gruppi_totali,$gruppi[0]->gruppi);
-
-        $i = count($gruppi_totali);
-        while ( $all && $gruppi[0]->other == 'ok' ) {
-            $x = $from + $i;
-            $response = $this->remoteCall($this->baseUrl.'/getGruppi/start/'.$x.'/token/'.$this->currentToken);
-            $gruppi = json_decode($this->decodeAES($response));
-            $gruppi_totali = array_merge($gruppi_totali,$gruppi[0]->gruppi);
-            $i = count($gruppi_totali);
-        }
-
-        return $gruppi_totali;
+    public function getGruppi($from,$length){
+        return $this->remote_totali($from,$length,'getGruppi');
     }
 
     public function getRagazzi($from,$length){
-        /*
-        $response = $this->remoteCall($this->baseUrl.'/getRagazzi/start/'.$from.'/token/'.$this->currentToken);
-        $ragazzi = json_decode($this->decodeAES($response));
-
-        $ragazzi_totali = array();
-
-        if ( count($ragazzi[0]->partecipanti[0]) > 0 ) {
-            $ragazzi_totali = array_merge($ragazzi_totali,$ragazzi[0]->partecipanti);
-        }
-
-        $i = count($ragazzi_totali);
-        while ( $ragazzi[0]->other == 'ok' && $i < $length ) {
-            $x = $from + $i;
-            $response = $this->remoteCall($this->baseUrl.'/getRagazzi/start/'.$x.'/token/'.$this->currentToken);
-            $ragazzi = json_decode($this->decodeAES($response));
-
-            if ( count($ragazzi[0]->partecipanti[0]) > 0 ) {
-                $ragazzi_totali = array_merge($ragazzi_totali,$ragazzi[0]->partecipanti);
-            }
-
-            $i = count($ragazzi_totali);
-        }
-
-        $this->log->addDebug('Downloaded '.$i);
-
-        return $ragazzi_totali;
-        */
         return $this->remote_totali($from,$length,'getRagazzi');
     }
 
     public function getCapi($from,$length){
-        /*
-        $response = $this->remoteCall($this->baseUrl.'/getCapi/start/'.$from.'/token/'.$this->currentToken);
-        $capi = json_decode($this->decodeAES($response));
-
-        $capi_totali = array();
-
-        if ( count($capi[0]->partecipanti[0]) > 0 ) {
-            $capi_totali = array_merge($capi_totali,$capi[0]->partecipanti);
-        }
-
-        $i = count($capi_totali);
-        while ( $capi[0]->other == 'ok' && $i < $length ) {
-
-            $x = $from + $i;
-            $response = $this->remoteCall($this->baseUrl.'/getCapi/start/'.$x.'/token/'.$this->currentToken);
-            $capi = json_decode($this->decodeAES($response));
-
-            if ( count($capi[0]->partecipanti[0]) > 0 ) {
-                $capi_totali = array_merge($capi_totali,$capi[0]->partecipanti);
-            }
-
-            $i = count($capi_totali);
-        }
-
-        return $capi_totali;
-        */
         return $this->remote_totali($from,$length,'getCapi');
     }
 

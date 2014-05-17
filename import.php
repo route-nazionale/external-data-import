@@ -48,6 +48,10 @@ $arguments->addFlag(array('import-internal-lab', 'i'), 'Turn on import internal 
 $arguments->addFlag(array('import-subarea', 's'), 'Turn on import sub area [FILE]');
 $arguments->addFlag(array('import-route', 'u'), 'Turn on import route definition [FILE]');
 
+// TODO
+$arguments->addFlag(array('import-ragazzi-internazionale', 'z'), 'Turn on import world ragazzi[FILE]');
+$arguments->addFlag(array('import-clan-lab', 'a'), 'Turn on import clan lab [FILE]');
+
 $arguments->parse();
 if ($arguments['help']) {
     echo $arguments->getHelpScreen();
@@ -97,12 +101,13 @@ try {
 
     // setto il database di default
     R::setup($dsn, $username, $password);
-    R::freeze(false);
 
     if (isset($arguments_parsed['production-mode'])) {
         $all = true; //demo mode
+        R::freeze(true);
     } else {
         $all = false; //demo mode
+        R::freeze(false);
     }
 
 
@@ -130,20 +135,33 @@ try {
 
     }
 
-
     if (isset($arguments_parsed['import-gruppi'])) {
 
-        $gruppi = $proxy->getGruppi($all);
+        $i = 0;
+        $running = true;
+        while($running){
 
-        foreach ($gruppi as $gruppo) {
-            $log->addInfo('Gruppo ', array('codice' => $gruppo->codice, 'nome' => $gruppo->nome, 'unita' => $gruppo->unita, 'regione' => $gruppo->regione));
+            $gruppi = $proxy->getGruppi($i,10);
 
-            $gruppo_row = R::dispense('gruppi');
-            $gruppo_row->idgruppo 		= $gruppo->codice;
-            $gruppo_row->nome 			= $gruppo->nome;
-            $gruppo_row->unita 			= $gruppo->unita;
-            $gruppo_row->regione 		= $gruppo->regione;
-            $id = R::store($gruppo_row);
+            if ($all) {
+                $gruppi_estratti = count($gruppi);
+                $i += $gruppi_estratti;
+                if ( $gruppi_estratti < 10 ) $running = false;
+            } else {
+                $running = false;
+            }
+
+            foreach ($gruppi as $gruppo) {
+                $log->addInfo('Gruppo ', array('codice' => $gruppo->codice, 'nome' => $gruppo->nome, 'unita' => $gruppo->unita, 'regione' => $gruppo->regione));
+
+                $gruppo_row = R::dispense('gruppi');
+                $gruppo_row->idgruppo 		= $gruppo->codice;
+                $gruppo_row->nome 			= $gruppo->nome;
+                $gruppo_row->unita 			= $gruppo->unita;
+                $gruppo_row->regione 		= $gruppo->regione;
+                $id = R::store($gruppo_row);
+
+            }
 
         }
     }
