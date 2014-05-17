@@ -69,7 +69,7 @@ class ProxyHelper {
         $remote_totali = array();
 
         if ( count($remoteObjects[0]->gruppi[0]) > 0 ) {
-            $remote_totali = array_merge($remote_totali,$remoteObjects[0]->partecipanti);
+            $remote_totali = array_merge($remote_totali,$remoteObjects[0]->gruppi);
         }
 
         $i = count($remote_totali);
@@ -80,7 +80,7 @@ class ProxyHelper {
             $remoteObjects = json_decode($this->decodeAES($response));
 
             if ( count($remoteObjects[0]->gruppi[0]) > 0 ) {
-                $remote_totali = array_merge($remote_totali,$remoteObjects[0]->partecipanti);
+                $remote_totali = array_merge($remote_totali,$remoteObjects[0]->gruppi);
             }
 
             $i = count($remote_totali);
