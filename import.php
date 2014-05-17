@@ -458,7 +458,9 @@ try {
 
                 foreach($recapiti as $recapito) {
 
-                    if  ( !is_null($recapito->tipo)) {
+                    if  ( !is_object($recapito)) {
+                        $log->addError('recapito invalido ',array('codice censimento' => $capo->codicesocio));
+                    } else {
 
                         $log->addInfo("\t".'Recapito ', array('tipo' => $recapito->tipo, 'valore' => $recapito->valore));
                         if ( $recapito->tipo == 'email' ){
