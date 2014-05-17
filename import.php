@@ -571,6 +571,7 @@ try {
                 $ragazzo_row->idunitagruppo     = $ragazzo->unita;
 
                 switch($eta_ragazzo){
+                    case 13:
                     case 14:
                     case 15:
                     case 16:
@@ -708,7 +709,7 @@ try {
                 } catch(Exception $e){
                     $log->addError($e->getMessage());
                 }
-                
+
             }
         }
     }
