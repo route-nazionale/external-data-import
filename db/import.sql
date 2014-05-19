@@ -369,3 +369,62 @@ CREATE TABLE capolaboratorio (
   patologie text COMMENT 'patologie',
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+# Dump of table tavolers
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS tavolers;
+
+CREATE TABLE tavolers (
+  id int(11) unsigned NOT NULL AUTO_INCREMENT,
+  code tinyint(3) unsigned DEFAULT NULL,
+  stradadicoraggio varchar(255) DEFAULT NULL,
+  nomecognome varchar(255) DEFAULT NULL,
+  telefono varchar(255) DEFAULT NULL,
+  cellulare varchar(255) DEFAULT NULL,
+  email varchar(255) DEFAULT NULL,
+  titolo varchar(255) DEFAULT NULL,
+  obiettivi text,
+  idgruppo varchar(255) NOT NULL,
+  idunita varchar(255) NOT NULL,
+  nomeclan varchar(255) DEFAULT NULL,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+# Dump of table vegliers
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS vegliers;
+
+CREATE TABLE vegliers (
+  id int(11) unsigned NOT NULL AUTO_INCREMENT,
+  stradadicoraggio varchar(255) DEFAULT NULL,
+  nomecognome varchar(255) DEFAULT NULL,
+  telefono varchar(255) DEFAULT NULL,
+  cellulare varchar(255) DEFAULT NULL,
+  email text COLLATE utf8_unicode_ci,
+  titolo varchar(255) DEFAULT NULL,
+  obiettivi varchar(255) DEFAULT NULL,
+  idgruppo varchar(255) NOT NULL,
+  idunita varchar(255) NOT NULL,
+  nomeclan varchar(255) DEFAULT NULL,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+# Dump of table labrs
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS labrs;
+
+CREATE TABLE labrs (
+  id int(11) unsigned NOT NULL AUTO_INCREMENT,
+  tipo enum('RS','capo') NOT NULL DEFAULT 'RS',
+  nome varchar(255) DEFAULT NULL,
+  cognome varchar(255) DEFAULT NULL,
+  codicesocio int(11) unsigned NOT NULL,
+  turno tinyint(3) unsigned NOT NULL,
+  turnodesc varchar(255) NOT NULL,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

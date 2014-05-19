@@ -24,6 +24,124 @@ function getAge($birthday)
 }
 
 
+function excelFileParsing($inputFileName, $funMap, $from_row_number, $log, $desc) {
+    //  Read your Excel workbook
+    try {
+        $inputFileType = PHPExcel_IOFactory::identify($inputFileName);
+        $objReader = PHPExcel_IOFactory::createReader($inputFileType);
+        $objPHPExcel = $objReader->load($inputFileName);
+    } catch (Exception $e) {
+        die('Error loading file "' . pathinfo($inputFileName, PATHINFO_BASENAME) . '": ' . $e->getMessage());
+    }
+
+    //  Get worksheet dimensions
+    $sheet = $objPHPExcel->getSheet(0);
+    $highestRow = $sheet->getHighestRow();
+    $highestColumn = $sheet->getHighestColumn();
+
+    //  Loop through each row of the worksheet in turn
+    for ($row_i = $from_row_number; $row_i <= $highestRow; $row_i++) { //skip prima riga
+        try {
+
+            //  Read a row of data into an array
+            $rowData = $sheet->rangeToArray('A' . $row_i . ':' . $highestColumn . $row_i, NULL, TRUE, FALSE);
+
+            $row = $rowData[0];
+
+            $log->addInfo($desc.$row_i, json_decode(json_encode($row), true)  );
+
+            call_user_func($funMap, $row);
+
+        } catch (Exception $e) {
+            die('Error reading file "' . pathinfo($inputFileName, PATHINFO_BASENAME) . '": ' . $e->getMessage());
+        }
+    }
+}
+
+function mapLaboratoriRS($row){
+
+    if ( !empty($row[1]) ){
+
+        $labrs_row = R::dispense('labrs');
+        $labrs_row->tipo    							= $row[0 ];
+        $labrs_row->nome								= $row[1 ];
+        $labrs_row->cognome								= $row[2 ];
+        $labrs_row->codicesocio 						= $row[3 ];
+
+        list($turnoS) = explode(" ",$row[6]);
+        $turno = intval($turnoS);
+
+        $labrs_row->turno								= $turno;
+        $labrs_row->turnodesc								= $row[6 ];
+
+        $id = R::store($labrs_row);
+
+    }
+
+}
+
+function mapTavoleRotondeRS($row){
+
+    if ( !empty($row[0]) && !empty($row[1]) ){
+
+        $tavolers_row = R::dispense('tavolers');
+        $tavolers_row->code    							= $row[1 ];
+        $tavolers_row->stradadicoraggio                 = $row[3 ];
+        $tavolers_row->nomecognome							= $row[6 ];
+        $tavolers_row->telefono							= $row[7 ];
+        $tavolers_row->cellulare							= $row[8 ];
+        $tavolers_row->email							= $row[9 ];
+
+        $tavolers_row->titolo                        = $row[11 ];
+        $tavolers_row->obiettivi                        = $row[12 ];
+
+        list($idgruppo, $idunita) =  explode(" ",$row[14 ]);
+
+        $idunita = str_replace(')','',str_replace('(','',$idunita));
+
+        $tavolers_row->idgruppo 						= trim($idgruppo);
+        $tavolers_row->idunita                          = trim($idunita);
+        $tavolers_row->nomeclan						    = $row[15 ];
+
+        $id = R::store($tavolers_row);
+
+    }
+
+}
+
+function mapVeglieRS($row){
+
+    if ( !empty($row[0]) ){
+
+        $vegliers_row = R::dispense('vegliers');
+
+        $vegliers_row->stradadicoraggio                 = $row[2 ];
+
+        $vegliers_row->nomecognome							= $row[5 ];
+        $vegliers_row->telefono							= $row[6 ];
+        $vegliers_row->cellulare							= $row[7 ];
+
+
+        //TODO: DA PULIRE IL DATO??
+        $vegliers_row->email							= $row[8 ];
+
+        $vegliers_row->titolo                        = $row[10 ];
+        $vegliers_row->obiettivi                        = $row[11 ];
+
+        list($idgruppo, $idunita) =  explode(" ",$row[13 ],2);
+
+        $idunita = str_replace(')','',str_replace('(','',$idunita));
+
+        $vegliers_row->idgruppo 						= trim($idgruppo);
+        $vegliers_row->idunita                          = trim($idunita);
+        $vegliers_row->nomeclan						    = $row[14 ];
+
+        $id = R::store($vegliers_row);
+
+    }
+
+}
+
 $strict = in_array('--strict', $_SERVER['argv']);
 $arguments = new \cli\Arguments(compact('strict'));
 
@@ -45,6 +163,11 @@ $arguments->addFlag(array('import-oneteam', 'o'), 'Turn on import oneteam [API]'
 $arguments->addFlag(array('import-gruppi', 'g'), 'Turn on import gruppi [API]');
 $arguments->addFlag(array('import-external-lab', 'e'), 'Turn on import external lab [FILE]');
 $arguments->addFlag(array('import-internal-lab', 'i'), 'Turn on import internal lab [FILE]');
+
+$arguments->addFlag(array('import-internal-rs', 'b'), 'Turn on import internal rs lab [FILE]');
+$arguments->addFlag(array('import-tavole-rs', 't'), 'Turn on import tavole rs lab [FILE]');
+$arguments->addFlag(array('import-veglie-rs', 'n'), 'Turn on import veglie rs lab [FILE]');
+
 $arguments->addFlag(array('import-subarea', 's'), 'Turn on import sub area [FILE]');
 $arguments->addFlag(array('import-route', 'u'), 'Turn on import route definition [FILE]');
 
@@ -116,6 +239,9 @@ try {
     }
 
     $proxy = new \Iscrizioni\ProxyHelper($config['base_url']);
+
+
+
 
     if (isset($arguments_parsed['import-ragazzi']) || isset($arguments_parsed['import-oneteam']) || isset($arguments_parsed['import-extra']) || isset($arguments_parsed['import-capolaboratorio']) || isset($arguments_parsed['import-capi']) || isset($arguments_parsed['import-gruppi'])) {
 
@@ -814,6 +940,41 @@ try {
         }
 
     }
+
+
+    if ( isset($arguments_parsed['import-internal-rs']) ) {
+
+        $inputFileName = 'labrs.xlsx';
+        if ( !empty($filename) ){
+            $inputFileName = $filename;
+        }
+
+        excelFileParsing($inputFileName,'mapLaboratoriRS',2, $log, 'Lab Interno RS ');
+
+    }
+
+    if ( isset($arguments_parsed['import-tavole-rs']) ) {
+
+        $inputFileName = 'tavolers.xlsx';
+        if ( !empty($filename) ){
+            $inputFileName = $filename;
+        }
+
+        excelFileParsing($inputFileName,'mapTavoleRotondeRS',2, $log, 'Tavola Rotonda RS ');
+
+    }
+
+    if ( isset($arguments_parsed['import-veglie-rs']) ) {
+
+        $inputFileName = 'vegliers.xlsx';
+        if ( !empty($filename) ){
+            $inputFileName = $filename;
+        }
+
+        excelFileParsing($inputFileName,'mapVeglieRS',2, $log, 'Veglie RS ');
+
+    }
+
 
     if (isset($arguments_parsed['import-external-lab'])) {
 
