@@ -1159,7 +1159,7 @@ try {
                 $gemellaggio_row->codicesocio	     = $row[2];    // codice_socio
                 $gemellaggio_row->regione			 = $row[3];    // Regione_dove_svolge_servizio
                 $gemellaggio_row->gruppo			 = $row[4];    // Gruppo_dove_svolge_servizio
-                $gemellaggio_row->idgruppo		     = $row[5];    // ordinale gruppo dove svolge servizio
+                $gemellaggio_row->ordgruppo		     = $row[5];    // ordinale gruppo dove svolge servizio (decregione + ordinalegruppo = idgruppo)
                 $gemellaggio_row->idunita			 = $row[6];    // unita_servizio
                 $gemellaggio_row->cognome			 = $row[7];    // Cognome
                 $gemellaggio_row->nome			     = $row[8];    // Nome

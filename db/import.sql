@@ -83,6 +83,18 @@ CREATE TABLE modpagamento (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
+# Dump of table decregione
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS decregione;
+
+CREATE TABLE decregione (
+  id int(11) unsigned NOT NULL AUTO_INCREMENT,
+  abr varchar(10) NOT NULL COMMENT 'regione abbreviata',
+  lettera char(1) NOT NULL COMMENT 'lettera di codifica nel codice gruppo (lettera + ordinativo gruppo)',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 # Dump of table gruppi
 # ------------------------------------------------------------
 
@@ -329,7 +341,7 @@ CREATE TABLE gemellaggio (
   codicesocio varchar(255) DEFAULT NULL,
   regione varchar(255) DEFAULT NULL,
   gruppo varchar(255) DEFAULT NULL,
-  idgruppo int(11) unsigned DEFAULT NULL,
+  ordgruppo int(11) unsigned DEFAULT NULL,
   idunita varchar(255) DEFAULT NULL,
   cognome varchar(255) DEFAULT NULL,
   nome varchar(255) DEFAULT NULL,
@@ -428,3 +440,5 @@ CREATE TABLE labrs (
   turnodesc varchar(255) NOT NULL,
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+

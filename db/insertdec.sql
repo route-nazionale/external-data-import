@@ -38,3 +38,31 @@ VALUES
 	(1,1,'Carta di credito'),
 	(2,2,'Bonifico'),
 	(3,3,'Partecipa con unita RS');
+
+
+
+INSERT INTO decregione (lettera,abr)  VALUES ("A",	"CM_NAZ");
+INSERT INTO decregione (lettera,abr)  VALUES ("B",	"ABR");
+INSERT INTO decregione (lettera,abr)  VALUES ("C",	"BAS");
+INSERT INTO decregione (lettera,abr)  VALUES ("D",	"CAL");
+INSERT INTO decregione (lettera,abr)  VALUES ("E",	"CAM");
+INSERT INTO decregione (lettera,abr)  VALUES ("F",	"EMR");
+INSERT INTO decregione (lettera,abr)  VALUES ("G",	"FVG");
+INSERT INTO decregione (lettera,abr)  VALUES ("H",	"LAZ");
+INSERT INTO decregione (lettera,abr)  VALUES ("I",	"LIG");
+INSERT INTO decregione (lettera,abr)  VALUES ("L",	"LOM");
+INSERT INTO decregione (lettera,abr)  VALUES ("M",	"MAR");
+INSERT INTO decregione (lettera,abr)  VALUES ("N",	"MOL");
+INSERT INTO decregione (lettera,abr)  VALUES ("O",	"PMN");
+INSERT INTO decregione (lettera,abr)  VALUES ("P",	"PUG");
+INSERT INTO decregione (lettera,abr)  VALUES ("Q",	"SAR");
+INSERT INTO decregione (lettera,abr)  VALUES ("R",	"SIC");
+INSERT INTO decregione (lettera,abr)  VALUES ("S",	"TOS");
+INSERT INTO decregione (lettera,abr)  VALUES ("T",	"TAA");
+INSERT INTO decregione (lettera,abr)  VALUES ("U",	"UMB");
+INSERT INTO decregione (lettera,abr)  VALUES ("V",	"VAO");
+INSERT INTO decregione (lettera,abr)  VALUES ("W",	"ESTERI");
+INSERT INTO decregione (lettera,abr)  VALUES ("Y",	"ABB_OM");
+INSERT INTO decregione (lettera,abr)  VALUES ("Z",	"VEN");
+
+	

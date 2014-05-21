@@ -5,6 +5,7 @@ CREATE TABLE ragazzi(
 	cognome VARCHAR(100) NOT NULL,
 	eta INT NOT NULL,
 	idgruppo CHAR(5) NOT NULL,
+	idunita VARCHAR(3) NOT NULL,
 	handicap TINYINT(1) not null default 0,
 	novizio TINYINT(1) not null default 0,
 	stradadicoraggio1 TINYINT(1) not null default 0,
@@ -19,6 +20,7 @@ CREATE TABLE gruppi(
 	nome VARCHAR(100) NOT NULL,
 	sottocampo INT NOT NULL,
 	idgruppo CHAR(5) NOT NULL,
+	idunita VARCHAR(3) NOT NULL,
 	gemellaggio INT NOT NULL
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
