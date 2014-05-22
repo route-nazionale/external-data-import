@@ -802,7 +802,6 @@ try {
                         break;
                     default:
                         \cli\out('invalid data strada1 : ' . $ragazzo->strada1 . "\n");
-                        exit - 1;
                         break;
                 }
 
@@ -824,7 +823,6 @@ try {
                         break;
                     default:
                         \cli\out('invalid data strada2 : ' . $ragazzo->strada2 . "\n");
-                        exit - 1;
                         break;
                 }
 
@@ -846,10 +844,8 @@ try {
                         break;
                     default:
                         \cli\out('invalid data strada3 : ' . $ragazzo->strada3 . "\n");
-                        exit - 1;
                         break;
                 }
-
 
                 $ragazzo_row->colazione = $ragazzo->colazione;
 
