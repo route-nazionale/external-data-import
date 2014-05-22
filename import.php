@@ -148,10 +148,13 @@ function mapVincoliCodici($row){
 
         $vincoli_row = R::dispense('vincoli');
 
-        $vincoli_row->codice        = $row[1];
+        $vincoli_row->codice        = $row[2];
         $vincoli_row->turn1 = 'CODICI';
         $vincoli_row->turn2 = 'CODICI';
         $vincoli_row->turn3 = 'CODICI';
+        $vincoli_row->cognome = $row[3];
+        $vincoli_row->nome = $row[4];
+        $vincoli_row->cellulare = $row[6];
 
         $id = R::store($vincoli_row);
 
