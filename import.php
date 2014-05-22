@@ -162,6 +162,44 @@ function mapVincoliCodici($row){
 
 }
 
+function mapStranieri($row){
+
+    if ( !empty($row[0]) ){
+
+        $stranieri_row = R::dispense('stranieri');
+
+
+        $stranieri_row->route        = $row[2];
+        $stranieri_row->country        = $row[3];
+        $stranieri_row->association     = $row[4];
+        $stranieri_row->groupname     = $row[5];
+
+        $stranieri_row->name     = $row[8];
+
+        $stranieri_row->dtnascita     = $row[9];
+        $stranieri_row->gender     = $row[13];
+        $stranieri_row->number = $row[14];
+        $stranieri_row->cellphone = $row[15];
+
+        $stranieri_row->emergencyname = $row[17];
+        $stranieri_row->emergencycell = $row[18];
+
+        $stranieri_row->language = $row[20];
+
+        $stranieri_row->esigenzealim = $row[25];
+        $stranieri_row->foodallergy = $row[26];
+        $stranieri_row->foodallergy2 = $row[27];
+
+        $stranieri_row->medic = $row[28];
+        $stranieri_row->mobilita = $row[29];
+        $stranieri_row->medicalcond = $row[30];
+
+        $id = R::store($stranieri_row);
+
+    }
+
+}
+
 
 $strict = in_array('--strict', $_SERVER['argv']);
 $arguments = new \cli\Arguments(compact('strict'));
@@ -1006,6 +1044,18 @@ try {
         excelFileParsing($inputFileName,'mapVincoliCodici',2, $log, 'Vincoli Laboratorio Codici');
 
     }
+
+    if ( isset($arguments_parsed['import-ragazzi-internazionale']) ) {
+
+        $inputFileName = 'stranieri.xlsx';
+        if ( !empty($filename) ){
+            $inputFileName = $filename;
+        }
+
+        excelFileParsing($inputFileName,'mapStranieri',3, $log, 'Iscrizioni stranieri');
+
+    }
+
 
 
 
