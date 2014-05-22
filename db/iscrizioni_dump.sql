@@ -65,3 +65,12 @@ CREATE TABLE tavolerotonde (
   stradadicoraggio4 TINYINT(1) not null default 0,
   stradadicoraggio5 TINYINT(1) not null default 0
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE vincoli (
+  id int(11) unsigned NOT NULL AUTO_INCREMENT,
+  codicecensimento VARCHAR(7) NOT NULL,
+  turn1 varchar(50) DEFAULT NULL,
+  turn2 varchar(50) DEFAULT NULL,
+  turn3 varchar(50) DEFAULT NULL,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
