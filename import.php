@@ -142,6 +142,24 @@ function mapVeglieRS($row){
 
 }
 
+function mapVincoliCodici($row){
+
+    if ( !empty($row[0]) ){
+
+        $vincoli_row = R::dispense('vincoli');
+
+        $vincoli_row->codice        = $row[1];
+        $vincoli_row->turn1 = 'CODICI';
+        $vincoli_row->turn2 = 'CODICI';
+        $vincoli_row->turn3 = 'CODICI';
+
+        $id = R::store($vincoli_row);
+
+    }
+
+}
+
+
 $strict = in_array('--strict', $_SERVER['argv']);
 $arguments = new \cli\Arguments(compact('strict'));
 
@@ -974,6 +992,18 @@ try {
         excelFileParsing($inputFileName,'mapVeglieRS',2, $log, 'Veglie RS ');
 
     }
+
+    if ( isset($arguments_parsed['import-clan-lab']) ) {
+
+        $inputFileName = 'laboratoriCodici.xlsx';
+        if ( !empty($filename) ){
+            $inputFileName = $filename;
+        }
+
+        excelFileParsing($inputFileName,'mapVincoliCodici',2, $log, 'Vincoli Laboratorio Codici');
+
+    }
+
 
 
     if (isset($arguments_parsed['import-external-lab'])) {
