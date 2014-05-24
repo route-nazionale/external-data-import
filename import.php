@@ -23,7 +23,6 @@ function getAge($birthday)
     return $diff->format('%y');
 }
 
-
 function excelFileParsing($inputFileName, $funMap, $from_row_number, $log, $desc) {
     //  Read your Excel workbook
     try {
@@ -40,6 +39,7 @@ function excelFileParsing($inputFileName, $funMap, $from_row_number, $log, $desc
     $highestColumn = $sheet->getHighestColumn();
 
     //  Loop through each row of the worksheet in turn
+    $row_i = 0;
     for ($row_i = $from_row_number; $row_i <= $highestRow; $row_i++) { //skip prima riga
         try {
 
@@ -53,7 +53,7 @@ function excelFileParsing($inputFileName, $funMap, $from_row_number, $log, $desc
             call_user_func($funMap, $row);
 
         } catch (Exception $e) {
-            die('Error reading file "' . pathinfo($inputFileName, PATHINFO_BASENAME) . '": ' . $e->getMessage());
+            die('Error reading file "' . pathinfo($inputFileName, PATHINFO_BASENAME) . '" row '.$row_i.' : ' . $e->getMessage());
         }
     }
 }

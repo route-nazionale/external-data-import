@@ -442,3 +442,25 @@ CREATE TABLE labrs (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
+# Dump of table gestioneoneteam
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS gestioneoneteam;
+
+CREATE TABLE `gestioneoneteam` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `regione` varchar(255) NOT NULL,
+  `codicesocio` int(11) unsigned NOT NULL,
+  `cognome` varchar(255) NOT NULL,
+  `nome` varchar(255) NOT NULL,
+  `sesso` varchar(255) NOT NULL,
+  `luogonascita` varchar(255) DEFAULT NULL,
+  `datanascita` int(11) unsigned DEFAULT NULL,
+  `eta` tinyint(3) unsigned DEFAULT NULL,
+  `cell` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `ae` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
