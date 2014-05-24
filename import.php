@@ -174,6 +174,7 @@ function mapStranieri($row){
         $stranieri_row->association     = $row[4];
         $stranieri_row->groupname     = $row[5];
 
+        $stranieri_row->surname     = $row[7];
         $stranieri_row->name     = $row[8];
 
         $stranieri_row->dtnascita     = $row[9];
@@ -200,6 +201,30 @@ function mapStranieri($row){
 
 }
 
+function mapGestioneOneteam($row){
+
+
+    if ( !empty($row[5]) ){
+
+        $gestioneoneteam_row = R::dispense('gestioneoneteam');
+
+        $gestioneoneteam_row->regione          = $row[6] ;   //NOMEREG
+        $gestioneoneteam_row->codicesocio          = $row[7] ;   //codice_socio
+        $gestioneoneteam_row->cognome          = $row[11];   // Cognome
+        $gestioneoneteam_row->nome          = $row[12];   // Nome
+        $gestioneoneteam_row->sesso          = $row[18];   // Sesso
+        $gestioneoneteam_row->luogonascita          = $row[19];   // Luogo_Nasc.
+        $gestioneoneteam_row->datanascita          = $row[20];   // Data_Nasc.
+        $gestioneoneteam_row->eta          = $row[21];   // Eta
+        $gestioneoneteam_row->cell          = $row[27];   // cell
+        $gestioneoneteam_row->email          = $row[28];   // email
+        $gestioneoneteam_row->ae          = $row[32];   // AE
+
+        //$id = R::store($gestioneoneteam_row);
+
+    }
+}
+
 
 $strict = in_array('--strict', $_SERVER['argv']);
 $arguments = new \cli\Arguments(compact('strict'));
@@ -219,6 +244,7 @@ $arguments->addFlag(array('import-capi', 'c'), 'Turn on import capi [API]');
 $arguments->addFlag(array('import-capolaboratorio', 'l'), 'Turn on import capi laboratorio [API]');
 $arguments->addFlag(array('import-extra', 'x'), 'Turn on import capi extra [API]');
 $arguments->addFlag(array('import-oneteam', 'o'), 'Turn on import oneteam [API]');
+$arguments->addFlag(array('import-oneteam-offline', 'd'), 'Turn on import oneteam offline [FILE]');
 $arguments->addFlag(array('import-gruppi', 'g'), 'Turn on import gruppi [API]');
 $arguments->addFlag(array('import-external-lab', 'e'), 'Turn on import external lab [FILE]');
 $arguments->addFlag(array('import-internal-lab', 'i'), 'Turn on import internal lab [FILE]');
@@ -292,15 +318,11 @@ try {
         R::freeze(false);
     }
 
-
     if (isset($arguments_parsed['input-file'])) {
         $filename = $arguments_parsed['input-file'];
     }
 
     $proxy = new \Iscrizioni\ProxyHelper($config['base_url']);
-
-
-
 
     if (isset($arguments_parsed['import-ragazzi']) || isset($arguments_parsed['import-oneteam']) || isset($arguments_parsed['import-extra']) || isset($arguments_parsed['import-capolaboratorio']) || isset($arguments_parsed['import-capi']) || isset($arguments_parsed['import-gruppi'])) {
 
@@ -1000,7 +1022,6 @@ try {
 
     }
 
-
     if ( isset($arguments_parsed['import-internal-rs']) ) {
 
         $inputFileName = 'labrs.xlsx';
@@ -1045,6 +1066,17 @@ try {
 
     }
 
+    if ( isset($arguments_parsed['import-oneteam-offline']) ) {
+
+        $inputFileName = 'gestioneOneTeam.xlsx';
+        if ( !empty($filename) ){
+            $inputFileName = $filename;
+        }
+
+        excelFileParsing($inputFileName,'mapGestioneOneteam',2, $log, 'Gestione One Team gdoc');
+
+    }
+
     if ( isset($arguments_parsed['import-ragazzi-internazionale']) ) {
 
         $inputFileName = 'stranieri.xlsx';
@@ -1055,9 +1087,6 @@ try {
         excelFileParsing($inputFileName,'mapStranieri',3, $log, 'Iscrizioni stranieri');
 
     }
-
-
-
 
     if (isset($arguments_parsed['import-external-lab'])) {
 
