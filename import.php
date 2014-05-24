@@ -220,7 +220,7 @@ function mapGestioneOneteam($row){
         $gestioneoneteam_row->email          = $row[28];   // email
         $gestioneoneteam_row->ae          = $row[32];   // AE
 
-        //$id = R::store($gestioneoneteam_row);
+        $id = R::store($gestioneoneteam_row);
 
     }
 }
