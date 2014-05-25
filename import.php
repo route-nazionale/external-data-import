@@ -13,6 +13,47 @@ require 'config.php';
 use RedBean_Facade as R;
 use Monolog\Logger;
 
+function generaCodiceCensitoAgesci($organizzazione,$codicegruppo,$codiceCensimento){
+    $codice = array();
+
+    // categoria
+    switch($organizzazione) {
+        case 'Partecipante Adulto':
+            $codice[0] = 'B';
+            $codice[1] = 'B';
+            break;
+        case 'Partecipante Giovane':
+            $codice[0] = 'A';
+            $codice[1] = 'B';
+            break;
+        case 'kinderheim':
+            $codice[0] = 'A';
+            $codice[1] = 'A';
+            break;
+        default:
+            $codice[0] = 'X';
+            $codice[1] = 'X';
+            break;
+    }
+
+    // codice virtuale clan
+    $codice[2] = 0;
+    $codice[3] = 0;
+    $codice[4] = 0;
+    $codice[5] = 0;
+
+    // codice virtuale personale
+    $codice[6] = 0;
+    $codice[7] = 0;
+    $codice[8] = 0;
+    $codice[9] = 0;
+    $codice[10] = 0;
+    $codice[11] = 0;
+    $codice[12] = 0;
+
+    // versione [cambiera' quando saremo all'evento nelle ristampe]
+    $codice[13] = 0;
+}
 
 function getAge($birthday)
 {
@@ -255,10 +296,12 @@ $arguments->addFlag(array('import-veglie-rs', 'n'), 'Turn on import veglie rs la
 
 $arguments->addFlag(array('import-subarea', 's'), 'Turn on import sub area [FILE]');
 $arguments->addFlag(array('import-route', 'u'), 'Turn on import route definition [FILE]');
-
-// TODO
 $arguments->addFlag(array('import-ragazzi-internazionale', 'z'), 'Turn on import world ragazzi[FILE]');
 $arguments->addFlag(array('import-clan-lab', 'a'), 'Turn on import clan lab [FILE]');
+
+
+$arguments->addFlag(array('genera-uid-partecipante', 'u'), 'Genera codice partecipante');
+$arguments->addFlag(array('genera-guid-gruppo-virtuale', 'v'), 'Genera gruppo virtuale');
 
 $arguments->parse();
 if ($arguments['help']) {
@@ -824,7 +867,7 @@ try {
                         break;
                     default:
                         \cli\out('invalid data strada1 : ' . $ragazzo->strada1 . "\n");
-                        exit - 1;
+                        $log->addError('['.$ragazzo->codicesocio.']'.'strada di coraggio 1 non valida : ' . $ragazzo->strada1);
                         break;
                 }
 
@@ -846,7 +889,7 @@ try {
                         break;
                     default:
                         \cli\out('invalid data strada2 : ' . $ragazzo->strada2 . "\n");
-                        exit - 1;
+                        $log->addError('['.$ragazzo->codicesocio.']'.'strada di coraggio 2 non valida : ' . $ragazzo->strada2);
                         break;
                 }
 
@@ -868,7 +911,7 @@ try {
                         break;
                     default:
                         \cli\out('invalid data strada3 : ' . $ragazzo->strada3 . "\n");
-                        exit - 1;
+                        $log->addError('['.$ragazzo->codicesocio.']'.'strada di coraggio 3 non valida : ' . $ragazzo->strada3);
                         break;
                 }
 
@@ -1293,6 +1336,42 @@ try {
         }
 
     }
+
+    if (isset($arguments_parsed['genera-uid-partecipante'])) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+    if (isset($arguments_parsed['genera-guid-gruppo-virtuale'])) {
+
+        // codice virtuale clan
+        $start = 0;
+        $end = 9999;
+
+    }
+
+    /*
+    if (isset($arguments_parsed['genera-codice-laboratorio-virtuale'])) {
+
+        // codice virtuale clan
+        $start = 0;
+        $end = 9999;
+
+    }
+    */
 
 } catch (Exception $e){
     \cli\out('Error : ' . $e->getMessage(). "\n");
