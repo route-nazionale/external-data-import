@@ -4,8 +4,9 @@ CREATE VIEW routetounita  AS select g.route,CONCAT(de.lettera,'',g.ordgruppo) as
 
 CREATE VIEW routenumbers AS select * from countclanpeople cp join routetounita ru on cp.idgruppo = ru.codicegruppo and cp.idunitagruppo = ru.idunita;
 
+CREATE VIEW ragazziCibo AS select * from ragazzo r where r.allergiealimentari IS NOT NULL AND r.intolleranzealimentari IS NOT NULL;
 
-CREATE VIEW ragazziCibo AS select r.idgruppo,r.idunitagruppo from ragazzo r where r.allergiealimentari IS NOT NULL AND r.intolleranzealimentari IS NOT NULL;
+CREATE VIEW capiCibo AS select * from capo c where c.allergiealimentari IS NOT NULL AND c.intolleranzealimentari IS NOT NULL;
 
 
 

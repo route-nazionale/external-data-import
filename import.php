@@ -205,7 +205,7 @@ function mapVincoliCodici($row){
 
 function mapStranieri($row){
 
-    if ( !empty($row[0]) ){
+    if ( !empty($row[2]) ){
 
         $stranieri_row = R::dispense('stranieri');
 
@@ -1127,7 +1127,7 @@ try {
             $inputFileName = $filename;
         }
 
-        excelFileParsing($inputFileName,'mapStranieri',3, $log, 'Iscrizioni stranieri');
+        excelFileParsing($inputFileName,'mapStranieri',2, $log, 'Iscrizioni stranieri');
 
     }
 
