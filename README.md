@@ -4,6 +4,16 @@ External data import script
 Script di utilità per l'import dei dati da vari sorgenti
 
 
+Install
+-------
+
+After cloning the repo, get composer and then install the dependencies:
+
+    curl -sS https://getcomposer.org/installer | php
+    
+    php composer.php install
+
+
 
 Command line
 ------------
@@ -24,6 +34,7 @@ Command line
       --import-internal-lab, -i     Turn on import internal lab [FILE]
       --import-subarea, -s          Turn on import sub area [FILE]
       --import-route, -u            Turn on import route definition [FILE]
+
 
     Options
       --input-file, -f  Setta il file da caricare [default: /Users/yoghi/Documents/Workspace/external-data-import/resources/${nomefile}.xlxs]
