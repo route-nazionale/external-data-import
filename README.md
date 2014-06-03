@@ -11,7 +11,7 @@ After cloning the repo, get composer and then install the dependencies:
 
     curl -sS https://getcomposer.org/installer | php
     
-    php composer.php install
+    php composer.phar install
 
 
 
