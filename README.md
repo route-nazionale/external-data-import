@@ -7,11 +7,15 @@ Script di utilità per l'import dei dati da vari sorgenti
 Install
 -------
 
-After cloning the repo, get composer and then install the dependencies:
+After cloning the repo, get composer and install the dependencies:
 
     curl -sS https://getcomposer.org/installer | php
     
     php composer.phar install
+
+
+Copy the file config.php.dist to config.php and fill it with your data.
+
 
 
 
