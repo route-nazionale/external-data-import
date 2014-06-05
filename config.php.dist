@@ -6,10 +6,15 @@
  *
  */
 $config = array(
-    'base_url' => '',
-    'utente' => '',
-    'password' => '',
-    'key_path' => '',
+    'api' => array(
+        //api endpoint
+        'base_url' => '',
+        //api credentials
+        'utente' => '',
+        'password' => '',
+        //rsa key
+        'key_path' => '',
+    ),
     'log' => array(
         'filename' => './logs/'.date('Y-m-d').'.log'
     ),

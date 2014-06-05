@@ -13,260 +13,6 @@ require 'config.php';
 use RedBean_Facade as R;
 use Monolog\Logger;
 
-function generaCodiceCensitoAgesci($organizzazione,$codicegruppo,$codiceCensimento){
-    $codice = array();
-
-    // categoria
-    switch($organizzazione) {
-        case 'Partecipante Adulto':
-            $codice[0] = 'B';
-            $codice[1] = 'B';
-            break;
-        case 'Partecipante Giovane':
-            $codice[0] = 'A';
-            $codice[1] = 'B';
-            break;
-        case 'kinderheim':
-            $codice[0] = 'A';
-            $codice[1] = 'A';
-            break;
-        default:
-            $codice[0] = 'X';
-            $codice[1] = 'X';
-            break;
-    }
-
-    // codice virtuale clan
-    $codice[2] = 0;
-    $codice[3] = 0;
-    $codice[4] = 0;
-    $codice[5] = 0;
-
-    // codice virtuale personale
-    $codice[6] = 0;
-    $codice[7] = 0;
-    $codice[8] = 0;
-    $codice[9] = 0;
-    $codice[10] = 0;
-    $codice[11] = 0;
-    $codice[12] = 0;
-
-    // versione [cambiera' quando saremo all'evento nelle ristampe]
-    $codice[13] = 0;
-}
-
-function getAge($birthday)
-{
-    $datetime1 = new DateTime($birthday);
-    $datetime2 = new DateTime(date('Y-m-d'));
-    $diff = $datetime1->diff($datetime2);
-
-    return $diff->format('%y');
-}
-
-function excelFileParsing($inputFileName, $funMap, $from_row_number, $log, $desc) {
-    //  Read your Excel workbook
-    try {
-        $inputFileType = PHPExcel_IOFactory::identify($inputFileName);
-        $objReader = PHPExcel_IOFactory::createReader($inputFileType);
-        $objPHPExcel = $objReader->load($inputFileName);
-    } catch (Exception $e) {
-        die('Error loading file "' . pathinfo($inputFileName, PATHINFO_BASENAME) . '": ' . $e->getMessage());
-    }
-
-    //  Get worksheet dimensions
-    $sheet = $objPHPExcel->getSheet(0);
-    $highestRow = $sheet->getHighestRow();
-    $highestColumn = $sheet->getHighestColumn();
-
-    //  Loop through each row of the worksheet in turn
-    $row_i = 0;
-    for ($row_i = $from_row_number; $row_i <= $highestRow; $row_i++) { //skip prima riga
-        try {
-
-            //  Read a row of data into an array
-            $rowData = $sheet->rangeToArray('A' . $row_i . ':' . $highestColumn . $row_i, NULL, TRUE, FALSE);
-
-            $row = $rowData[0];
-
-            $log->addInfo($desc.$row_i, json_decode(json_encode($row), true)  );
-
-            call_user_func($funMap, $row);
-
-        } catch (Exception $e) {
-            die('Error reading file "' . pathinfo($inputFileName, PATHINFO_BASENAME) . '" row '.$row_i.' : ' . $e->getMessage());
-        }
-    }
-}
-
-function mapLaboratoriRS($row){
-
-    if ( !empty($row[1]) ){
-
-        $labrs_row = R::dispense('labrs');
-        $labrs_row->tipo    							= $row[0 ];
-        $labrs_row->nome								= $row[1 ];
-        $labrs_row->cognome								= $row[2 ];
-        $labrs_row->codicesocio 						= $row[3 ];
-
-        list($turnoS) = explode(" ",$row[6]);
-        $turno = intval($turnoS);
-
-        $labrs_row->turno								= $turno;
-        $labrs_row->turnodesc								= $row[6 ];
-
-        $id = R::store($labrs_row);
-
-    }
-
-}
-
-function mapTavoleRotondeRS($row){
-
-    if ( !empty($row[0]) && !empty($row[1]) ){
-
-        $tavolers_row = R::dispense('tavolers');
-        $tavolers_row->code    							= $row[1 ];
-        $tavolers_row->stradadicoraggio                 = $row[3 ];
-        $tavolers_row->nomecognome							= $row[6 ];
-        $tavolers_row->telefono							= $row[7 ];
-        $tavolers_row->cellulare							= $row[8 ];
-        $tavolers_row->email							= $row[9 ];
-
-        $tavolers_row->titolo                        = $row[11 ];
-        $tavolers_row->obiettivi                        = $row[12 ];
-
-        list($idgruppo, $idunita) =  explode(" ",$row[14 ]);
-
-        $idunita = str_replace(')','',str_replace('(','',$idunita));
-
-        $tavolers_row->idgruppo 						= trim($idgruppo);
-        $tavolers_row->idunita                          = trim($idunita);
-        $tavolers_row->nomeclan						    = $row[15 ];
-
-        $id = R::store($tavolers_row);
-
-    }
-
-}
-
-function mapVeglieRS($row){
-
-    if ( !empty($row[0]) ){
-
-        $vegliers_row = R::dispense('vegliers');
-
-        $vegliers_row->stradadicoraggio                 = $row[2 ];
-
-        $vegliers_row->nomecognome							= $row[5 ];
-        $vegliers_row->telefono							= $row[6 ];
-        $vegliers_row->cellulare							= $row[7 ];
-
-
-        //TODO: DA PULIRE IL DATO??
-        $vegliers_row->email							= $row[8 ];
-
-        $vegliers_row->titolo                        = $row[10 ];
-        $vegliers_row->obiettivi                        = $row[11 ];
-
-        list($idgruppo, $idunita) =  explode(" ",$row[13 ],2);
-
-        $idunita = str_replace(')','',str_replace('(','',$idunita));
-
-        $vegliers_row->idgruppo 						= trim($idgruppo);
-        $vegliers_row->idunita                          = trim($idunita);
-        $vegliers_row->nomeclan						    = $row[14 ];
-
-        $id = R::store($vegliers_row);
-
-    }
-
-}
-
-function mapVincoliCodici($row){
-
-    if ( !empty($row[0]) ){
-
-        $vincoli_row = R::dispense('vincoli');
-
-        $vincoli_row->codice        = $row[2];
-        $vincoli_row->turn1 = 'CODICI';
-        $vincoli_row->turn2 = 'CODICI';
-        $vincoli_row->turn3 = 'CODICI';
-        $vincoli_row->cognome = $row[3];
-        $vincoli_row->nome = $row[4];
-        $vincoli_row->cellulare = $row[6];
-
-        $id = R::store($vincoli_row);
-
-    }
-
-}
-
-function mapStranieri($row){
-
-    if ( !empty($row[2]) ){
-
-        $stranieri_row = R::dispense('stranieri');
-
-
-        $stranieri_row->route        = $row[2];
-        $stranieri_row->country        = $row[3];
-        $stranieri_row->association     = $row[4];
-        $stranieri_row->groupname     = $row[5];
-
-        $stranieri_row->surname     = $row[7];
-        $stranieri_row->name     = $row[8];
-
-        $stranieri_row->dtnascita     = $row[9];
-        $stranieri_row->gender     = $row[13];
-        $stranieri_row->number = $row[14];
-        $stranieri_row->cellphone = $row[15];
-
-        $stranieri_row->emergencyname = $row[17];
-        $stranieri_row->emergencycell = $row[18];
-
-        $stranieri_row->language = $row[20];
-
-        $stranieri_row->esigenzealim = $row[25];
-        $stranieri_row->foodallergy = $row[26];
-        $stranieri_row->foodallergy2 = $row[27];
-
-        $stranieri_row->medic = $row[28];
-        $stranieri_row->mobilita = $row[29];
-        $stranieri_row->medicalcond = $row[30];
-
-        $id = R::store($stranieri_row);
-
-    }
-
-}
-
-function mapGestioneOneteam($row){
-
-
-    if ( !empty($row[5]) ){
-
-        $gestioneoneteam_row = R::dispense('gestioneoneteam');
-
-        $gestioneoneteam_row->regione          = $row[6] ;   //NOMEREG
-        $gestioneoneteam_row->codicesocio          = $row[7] ;   //codice_socio
-        $gestioneoneteam_row->cognome          = $row[11];   // Cognome
-        $gestioneoneteam_row->nome          = $row[12];   // Nome
-        $gestioneoneteam_row->sesso          = $row[18];   // Sesso
-        $gestioneoneteam_row->luogonascita          = $row[19];   // Luogo_Nasc.
-        $gestioneoneteam_row->datanascita          = $row[20];   // Data_Nasc.
-        $gestioneoneteam_row->eta          = $row[21];   // Eta
-        $gestioneoneteam_row->cell          = $row[27];   // cell
-        $gestioneoneteam_row->email          = $row[28];   // email
-        $gestioneoneteam_row->ae          = $row[32];   // AE
-
-        $id = R::store($gestioneoneteam_row);
-
-    }
-}
-
-
 $strict = in_array('--strict', $_SERVER['argv']);
 $arguments = new \cli\Arguments(compact('strict'));
 
@@ -299,7 +45,6 @@ $arguments->addFlag(array('import-route', 'u'), 'Turn on import route definition
 $arguments->addFlag(array('import-ragazzi-internazionale', 'z'), 'Turn on import world ragazzi[FILE]');
 $arguments->addFlag(array('import-clan-lab', 'a'), 'Turn on import clan lab [FILE]');
 
-
 $arguments->addFlag(array('genera-uid-partecipante', 'u'), 'Genera codice partecipante');
 $arguments->addFlag(array('genera-guid-gruppo-virtuale', 'v'), 'Genera gruppo virtuale');
 
@@ -325,6 +70,7 @@ if (isset($arguments_parsed['quiet'])) {
 
 // create a log channel
 $log = new Logger('rescue-script');
+
 if (VERBOSE) {
     \cli\out($arguments->asJSON() . "\n");
 
@@ -345,7 +91,6 @@ if (VERBOSE) {
 }
 
 try {
-
     $dsn = 'mysql:host=' . $config['db']['host'] . ';dbname=' . $config['db']['database'];
     $username = $config['db']['user'];
     $password = $config['db']['password'];
@@ -354,10 +99,10 @@ try {
     R::setup($dsn, $username, $password);
 
     if (isset($arguments_parsed['production-mode'])) {
-        $all = true; //demo mode
+        $all = true; //demo mode OFF
         R::freeze(true);
     } else {
-        $all = false; //demo mode
+        $all = false; //demo mode ON
         R::freeze(false);
     }
 
@@ -365,611 +110,80 @@ try {
         $filename = $arguments_parsed['input-file'];
     }
 
-    $proxy = new \Iscrizioni\ProxyHelper($config['base_url']);
+    $client = new \Iscrizioni\ClientApi($log);
+    $proxy = new \Iscrizioni\ProxyHelper($client, $config['api']['base_url']);
 
-    if (isset($arguments_parsed['import-ragazzi']) || isset($arguments_parsed['import-oneteam']) || isset($arguments_parsed['import-extra']) || isset($arguments_parsed['import-capolaboratorio']) || isset($arguments_parsed['import-capi']) || isset($arguments_parsed['import-gruppi'])) {
+    $apiImportsFlags = array(
+        'import-gruppi' => 'importGruppi',
+        'import-oneteam' => 'importOneTeam',
+        'import-capolaboratorio' => 'importCapiLaboratorio',
+        'import-extra' => 'importExtra',
+        'import-capi' => 'importCapi',
+        'import-ragazzi' => 'importRagazzi',
+        'import-gruppi-extra' => 'importGruppiExtraAgesci',
+        'import-capi-extra' => 'importCapiExtraAgesci',
+        'import-ragazzi-extra' => 'importRagazziExtraAgesci',
+    );
+    var_dump(array_intersect(array_keys($apiImportsFlags), $arguments_parsed));
 
-        if (!(file_exists($config['key_path']))) {
-            \cli\out('invalid private key : ' . $config['key_path'] . "\n");
+    if ($apiImports = array_intersect_key($apiImportsFlags, $arguments_parsed)) {
+
+        if (!(file_exists($config['api']['key_path']))) {
+            \cli\out('invalid private key : ' . $config['api']['key_path'] . "\n");
             exit - 1;
         }
 
-        $fp = fopen($config['key_path'], "r");
+        $fp = fopen($config['api']['key_path'], "r");
         $priv_key = fread($fp, 8192);
         fclose($fp);
 
         $proxy->setLogger($log);
-        $proxy->setPrivateKey($priv_key);
-        $proxy->login($config['utente'], $config['password']);
+        $client->setPrivateKey($priv_key);
+        $proxy->login($config['api']['utente'], $config['api']['password']);
         $proxy->aesSetup();
 
-    }
+        $importer = new \Iscrizioni\Importer($log);
 
-    if (isset($arguments_parsed['import-gruppi'])) {
-
-        $i = 0;
-        $running = true;
-        while($running){
-
-            $gruppi = $proxy->getGruppi($i,10);
-
-            if ($all) {
-                $gruppi_estratti = count($gruppi);
-                $i += $gruppi_estratti;
-                if ( $gruppi_estratti < 10 ) $running = false;
-            } else {
-                $running = false;
-            }
-
-            foreach ($gruppi as $gruppo) {
-                $log->addInfo('Gruppo ', array('codice' => $gruppo->codice, 'nome' => $gruppo->nome, 'unita' => $gruppo->unita, 'regione' => $gruppo->regione));
-
-                $gruppo_row = R::dispense('gruppi');
-                $gruppo_row->idgruppo 		= $gruppo->codice;
-                $gruppo_row->nome 			= $gruppo->nome;
-                $gruppo_row->unita 			= $gruppo->unita;
-                $gruppo_row->regione 		= $gruppo->regione;
-                $id = R::store($gruppo_row);
-
-            }
-
+        foreach( $apiImports as $flag => $method) {
+            call_user_func_array([$importer, $method ], [$proxy, $all]);
         }
+//        if (isset($arguments_parsed['import-gruppi'])) {
+//
+//            $importer->importGruppi($proxy, $all);
+//        }
+//
+//        if (isset($arguments_parsed['import-oneteam'])) {
+//
+//            $importer->importOneTeam($proxy, $all);
+//        }
+//
+//        if (isset($arguments_parsed['import-capolaboratorio'])) {
+//
+//            $importer->importCapiLaboratorio($proxy, $all);
+//        }
+//
+//        if (isset($arguments_parsed['import-extra'])) {
+//
+//            $importer->importExtra($proxy, $all);
+//        }
+//
+//        if (isset($arguments_parsed['import-capi'])) {
+//
+//            $importer->importCapi($proxy, $all);
+//        }
+//
+//        if (isset($arguments_parsed['import-ragazzi'])) {
+//
+//            $importer->importRagazzi($proxy, $all);
+//        }
     }
 
-    if (isset($arguments_parsed['import-oneteam'])) {
-
-        $i = 0;
-        $running = true;
-        while($running){
-
-            $capiOne = $proxy->getCapiOneTeam($i,10);
-
-            if ($all) {
-                $capi_estratti = count($capiOne);
-                $i += $capi_estratti;
-                if ( $capi_estratti < 10 ) $running = false;
-            } else {
-                $running = false;
-            }
-
-            foreach ($capiOne as $capoOne) {
-
-                $log->addInfo('Capo One Team ', json_decode(json_encode($capoOne), true) );
-
-                $oneteam_row = R::dispense('oneteam');
-                $oneteam_row->codicecensimento	= $capoOne->codicesocio;
-                $oneteam_row->nome				= $capoOne->nome;
-                $oneteam_row->cognome			= $capoOne->cognome;
-
-                $oneteam_row->datanascita       = $capoOne->datanascita;
-
-                $eta_capo = getAge($capoOne->datanascita);//Formato 1988-01-31 YYYY-MM-GG
-                $oneteam_row->eta				= $eta_capo;
-
-                $oneteam_row->sesso             = $capoOne->sesso;
-
-                $oneteam_row->periodopartecipazione             = $capoOne->periodopartecipazione;
-
-                $oneteam_row->pagato             = $capoOne->pagato;
-                $oneteam_row->modpagamento             = $capoOne->modpagamento;
-
-                $oneteam_row->colazione = $capoOne->colazione;
-
-                $oneteam_row->alimentari = $capoOne->alimentari;
-
-                if ( $capoOne->intolleranzealimentari->presenti != 0 ){
-                    $oneteam_row->intolleranzealimentari = $capoOne->intolleranzealimentari->elenco;
-                } else {
-                    $oneteam_row->intolleranzealimentari = NULL;
-                }
-
-                if ( $capoOne->allergiealimentari->presenti != 0 ){
-                    $oneteam_row->allergiealimentari = $capoOne->allergiealimentari->elenco;
-                } else {
-                    $oneteam_row->allergiealimentari = NULL;
-                }
-
-                if ( $capoOne->allergiefarmaci->presenti != 0 ){
-                    $oneteam_row->allergiefarmaci = $capoOne->allergiefarmaci->elenco;
-                } else {
-                    $oneteam_row->allergiefarmaci = NULL;
-                }
-
-                if ( $capoOne->disabilita->presenti != 0 ){
-                    $oneteam_row->sensoriali = $capoOne->disabilita->sensoriali;
-                    $oneteam_row->psichiche = $capoOne->disabilita->psichiche;
-                    $oneteam_row->lis = $capoOne->disabilita->lis;
-                    $oneteam_row->fisiche = $capoOne->disabilita->fisiche;
-                } else {
-                    $oneteam_row->sensoriali = NULL;
-                    $oneteam_row->psichiche = NULL;
-                    $oneteam_row->lis = NULL;
-                    $oneteam_row->fisiche = NULL;
-                }
-
-                if ( $capoOne->patologie->presenti != 0 ){
-                    $oneteam_row->patologie = $capoOne->patologie->descrizione;
-                } else {
-                    $oneteam_row->patologie = NULL;
-                }
-
-                $id = R::store($oneteam_row);
-
-            }
-        }
-
-    }
-
-    if (isset($arguments_parsed['import-capolaboratorio'])) {
-
-        $i = 0;
-        $running = true;
-        while($running){
-
-            $capiLaboratorio = $proxy->getCapiLaboratorio($i,10);
-
-            if ($all) {
-                $capi_estratti = count($capiLaboratorio);
-                $i += $capi_estratti;
-                if ( $capi_estratti < 10 ) $running = false;
-            } else {
-                $running = false;
-            }
-
-            foreach ($capiLaboratorio as $capoLaboratorio) {
-
-                $log->addInfo('Capo Laboratorio ', json_decode(json_encode($capoLaboratorio), true) );
-
-                $laboratorio_row = R::dispense('capolaboratorio');
-                $laboratorio_row->codicecensimento	= $capoLaboratorio->codicesocio;
-                $laboratorio_row->nome				= $capoLaboratorio->nome;
-                $laboratorio_row->cognome			= $capoLaboratorio->cognome;
-
-                $laboratorio_row->datanascita       = $capoLaboratorio->datanascita;
-
-                $eta_capo = getAge($capoLaboratorio->datanascita);//Formato 1988-01-31 YYYY-MM-GG
-                $laboratorio_row->eta				= $eta_capo;
-
-                $laboratorio_row->sesso             = $capoLaboratorio->sesso;
-
-                $laboratorio_row->periodopartecipazione             = $capoLaboratorio->periodopartecipazione;
-
-                $laboratorio_row->pagato             = $capoLaboratorio->pagato;
-                $laboratorio_row->modpagamento             = $capoLaboratorio->modpagamento;
-
-                $laboratorio_row->colazione = $capoLaboratorio->colazione;
-
-                $laboratorio_row->alimentari = $capoLaboratorio->alimentari;
-
-                if ( $capoLaboratorio->intolleranzealimentari->presenti != 0 ){
-                    $laboratorio_row->intolleranzealimentari = $capoLaboratorio->intolleranzealimentari->elenco;
-                } else {
-                    $laboratorio_row->intolleranzealimentari = NULL;
-                }
-
-                if ( $capoLaboratorio->allergiealimentari->presenti != 0 ){
-                    $laboratorio_row->allergiealimentari = $capoLaboratorio->allergiealimentari->elenco;
-                } else {
-                    $laboratorio_row->allergiealimentari = NULL;
-                }
-
-                if ( $capoLaboratorio->allergiefarmaci->presenti != 0 ){
-                    $laboratorio_row->allergiefarmaci = $capoLaboratorio->allergiefarmaci->elenco;
-                } else {
-                    $laboratorio_row->allergiefarmaci = NULL;
-                }
-
-                if ( $capoLaboratorio->disabilita->presenti != 0 ){
-                    $laboratorio_row->sensoriali = $capoLaboratorio->disabilita->sensoriali;
-                    $laboratorio_row->psichiche = $capoLaboratorio->disabilita->psichiche;
-                    $laboratorio_row->lis = $capoLaboratorio->disabilita->lis;
-                    $laboratorio_row->fisiche = $capoLaboratorio->disabilita->fisiche;
-                } else {
-                    $laboratorio_row->sensoriali = NULL;
-                    $laboratorio_row->psichiche = NULL;
-                    $laboratorio_row->lis = NULL;
-                    $laboratorio_row->fisiche = NULL;
-                }
-
-                if ( $capoLaboratorio->patologie->presenti != 0 ){
-                    $laboratorio_row->patologie = $capoLaboratorio->patologie->descrizione;
-                } else {
-                    $laboratorio_row->patologie = NULL;
-                }
-
-                $id = R::store($laboratorio_row);
-
-            }
-        }
-
-    }
-
-    if (isset($arguments_parsed['import-extra'])) {
-
-        $i = 0;
-        $running = true;
-        while($running){
-
-            $capiExtra = $proxy->getCapiExtra($i,10);
-
-            if ($all) {
-                $capi_estratti = count($capiExtra);
-                $i += $capi_estratti;
-                if ( $capi_estratti < 10 ) $running = false;
-            } else {
-                $running = false;
-            }
-
-            foreach ($capiExtra as $capoExtra) {
-
-                $log->addInfo('Capo Extra ', json_decode(json_encode($capoExtra), true) );
-
-                $extra_row = R::dispense('capoextra');
-                $extra_row->codicecensimento	= $capoExtra->codicesocio;
-                $extra_row->nome				= $capoExtra->nome;
-                $extra_row->cognome			= $capoExtra->cognome;
-
-                $extra_row->datanascita       = $capoExtra->datanascita;
-
-                $eta_capo = getAge($capoExtra->datanascita);//Formato 1988-01-31 YYYY-MM-GG
-                $extra_row->eta				= $eta_capo;
-
-                $extra_row->sesso             = $capoExtra->sesso;
-
-                $extra_row->periodopartecipazione             = $capoExtra->periodopartecipazione;
-
-                $extra_row->pagato             = $capoExtra->pagato;
-                $extra_row->modpagamento             = $capoExtra->modpagamento;
-
-                $extra_row->colazione = $capoExtra->colazione;
-
-                $extra_row->alimentari = $capoExtra->alimentari;
-
-                if ( $capoExtra->intolleranzealimentari->presenti != 0 ){
-                    $extra_row->intolleranzealimentari = $capoExtra->intolleranzealimentari->elenco;
-                } else {
-                    $extra_row->intolleranzealimentari = NULL;
-                }
-
-                if ( $capoExtra->allergiealimentari->presenti != 0 ){
-                    $extra_row->allergiealimentari = $capoExtra->allergiealimentari->elenco;
-                } else {
-                    $extra_row->allergiealimentari = NULL;
-                }
-
-                if ( $capoExtra->allergiefarmaci->presenti != 0 ){
-                    $extra_row->allergiefarmaci = $capoExtra->allergiefarmaci->elenco;
-                } else {
-                    $extra_row->allergiefarmaci = NULL;
-                }
-
-                if ( $capoExtra->disabilita->presenti != 0 ){
-                    $extra_row->sensoriali = $capoExtra->disabilita->sensoriali;
-                    $extra_row->psichiche = $capoExtra->disabilita->psichiche;
-                    $extra_row->lis = $capoExtra->disabilita->lis;
-                    $extra_row->fisiche = $capoExtra->disabilita->fisiche;
-                } else {
-                    $extra_row->sensoriali = NULL;
-                    $extra_row->psichiche = NULL;
-                    $extra_row->lis = NULL;
-                    $extra_row->fisiche = NULL;
-                }
-
-                if ( $capoExtra->patologie->presenti != 0 ){
-                    $extra_row->patologie = $capoExtra->patologie->descrizione;
-                } else {
-                    $extra_row->patologie = NULL;
-                }
-
-                $id = R::store($extra_row);
-
-            }
-        }
-
-    }
-
-    if (isset($arguments_parsed['import-capi'])) {
-
-        $i = 0;
-        $running = true;
-        while($running){
-
-            $capi = $proxy->getCapi($i,10);
-
-            //echo count($capi)."\n";
-
-            if ($all) {
-                $capi_estratti = count($capi);
-                $i += $capi_estratti;
-                if ( $capi_estratti < 10 ) $running = false;
-            } else {
-                $running = false;
-            }
-
-            foreach ($capi as $capo) {
-
-                $log->addInfo('Capo ', json_decode(json_encode($capo), true) );
-
-                $capo_row = R::dispense('capo');
-                $capo_row->codicecensimento	= $capo->codicesocio;
-                $capo_row->nome				= $capo->nome;
-                $capo_row->cognome			= $capo->cognome;
-                $capo_row->idgruppo			= $capo->gruppo;
-                $capo_row->idunitagruppo     = $capo->unita;
-
-                $capo_row->datanascita       = $capo->datanascita;
-
-                $eta_capo = getAge($capo->datanascita);//Formato 1988-01-31 YYYY-MM-GG
-                $capo_row->eta				= $eta_capo;
-
-                $capo_row->sesso             = $capo->sesso;
-
-                $recapiti = $capo->recapiti;
-
-                foreach($recapiti as $recapito) {
-
-                    if  ( !is_object($recapito)) {
-                        $log->addError('recapito invalido ',array('codice censimento' => $capo->codicesocio));
-                    } else {
-
-                        $log->addInfo("\t".'Recapito ', array('tipo' => $recapito->tipo, 'valore' => $recapito->valore));
-                        if ( $recapito->tipo == 'email' ){
-                            $capo_row->email = $recapito->valore;
-                        }
-                        if ( $recapito->tipo == 'cellulare' ) {
-                            $capo_row->cellulare = $recapito->valore;
-                        }
-                        if ( $recapito->tipo == 'abitazione' ) {
-                            if  ( is_numeric($recapito->valore) ) $capo_row->abitazione = $recapito->valore;
-                        }
-
-                    }
-
-                }
-
-                $residenza = $capo->residenza;
-                $log->addInfo("\t".'Residenza', array('citta' => $residenza->citta));
-                $capo_row->indirizzo    = $residenza->indirizzo;
-                $capo_row->cap          = $residenza->cap;
-                $capo_row->citta        = $residenza->citta;
-                $capo_row->provincia    = $residenza->provincia;
-
-                $capo_row->ruolo = $capo->ruolo;
-
-                $capo_row->colazione = $capo->colazione;
-
-                $capo_row->alimentari = $capo->alimentari;
-
-                if ( $capo->intolleranzealimentari->presenti != 0 ){
-                    $capo_row->intolleranzealimentari = $capo->intolleranzealimentari->elenco;
-                } else {
-                    $capo_row->intolleranzealimentari = NULL;
-                }
-
-                if ( $capo->allergiealimentari->presenti != 0 ){
-                    $capo_row->allergiealimentari = $capo->allergiealimentari->elenco;
-                } else {
-                    $capo_row->allergiealimentari = NULL;
-                }
-
-                if ( $capo->allergiefarmaci->presenti != 0 ){
-                    $capo_row->allergiefarmaci = $capo->allergiefarmaci->elenco;
-                } else {
-                    $capo_row->allergiefarmaci = NULL;
-                }
-
-                if ( $capo->disabilita->presenti != 0 ){
-                    $capo_row->sensoriali = $capo->disabilita->sensoriali;
-                    $capo_row->psichiche = $capo->disabilita->psichiche;
-                    $capo_row->lis = $capo->disabilita->lis;
-                    $capo_row->fisiche = $capo->disabilita->fisiche;
-                } else {
-                    $capo_row->sensoriali = NULL;
-                    $capo_row->psichiche = NULL;
-                    $capo_row->lis = NULL;
-                    $capo_row->fisiche = NULL;
-                }
-
-                if ( $capo->patologie->presenti != 0 ){
-                    $capo_row->patologie = $capo->patologie->descrizione;
-                } else {
-                    $capo_row->patologie = NULL;
-                }
-
-                try {
-                    $id = R::store($capo_row);
-                } catch(Exception $e){
-                    $log->addError($e->getMessage(), array('codice socio' => $capo->codicesocio));
-                }
-
-            }
-        }
-
-    }
-
-    if (isset($arguments_parsed['import-ragazzi'])) {
-
-        $i = 0;
-        $running = true;
-        while($running){
-
-            $ragazzi = $proxy->getRagazzi($i,20);
-
-            if ($all) {
-                $ragazzi_estratti = count($ragazzi);
-                $i += $ragazzi_estratti;
-                if ( $ragazzi_estratti < 10 ) $running = false;
-            } else {
-                $running = false;
-            }
-
-            foreach ($ragazzi as $ragazzo) {
-
-                $log->addInfo('Ragazzo ', json_decode(json_encode($ragazzo), true) );
-
-                $ragazzo_row = R::dispense('ragazzo');
-                $ragazzo_row->codicecensimento	= $ragazzo->codicesocio;
-                $ragazzo_row->nome				= $ragazzo->nome;
-                $ragazzo_row->cognome			= $ragazzo->cognome;
-
-                $ragazzo_row->sesso             = $ragazzo->sesso;
-
-                $ragazzo_row->datanascita       = $ragazzo->datanascita;
-
-                $eta_ragazzo = getAge($ragazzo->datanascita);//Formato 1988-01-31 YYYY-MM-GG
-                $ragazzo_row->eta				= $eta_ragazzo;
-
-                $ragazzo_row->idgruppo			= $ragazzo->gruppo;
-                $ragazzo_row->idunitagruppo     = $ragazzo->unita;
-
-                switch($eta_ragazzo){
-                    case 13:
-                    case 14:
-                    case 15:
-                    case 16:
-                    case 17:
-                        $ragazzo_row->novizio			= 1; //da ricavare in base all'eta (16-17)
-                        break;
-                    case 18:
-                    case 19:
-                    case 20:
-                    case 21:
-                        $ragazzo_row->novizio			= 0; //da ricavare in base all'eta (16-17)
-                        break;
-                    default:
-                        \cli\out('['.$ragazzo->codicesocio.']'.'invalid age : ' . $eta_ragazzo . "\n");
-                        $log->addError('['.$ragazzo->codicesocio.']'.'invalid age : ' . $eta_ragazzo.' nato il '.$ragazzo->datanascita);
-                        $ragazzo_row->novizio			= 0;
-                        break;
-                }
-
-                $ragazzo_row->stradadicoraggio1	= 0;
-                $ragazzo_row->stradadicoraggio2	= 0;
-                $ragazzo_row->stradadicoraggio3	= 0;
-                $ragazzo_row->stradadicoraggio4	= 0;
-                $ragazzo_row->stradadicoraggio5	= 0;
-
-                switch($ragazzo->strada1){
-                    case 1:
-                        $ragazzo_row->stradadicoraggio1	= 1;
-                        break;
-                    case 2:
-                        $ragazzo_row->stradadicoraggio2	= 1;
-                        break;
-                    case 3:
-                        $ragazzo_row->stradadicoraggio3	= 1;
-                        break;
-                    case 4:
-                        $ragazzo_row->stradadicoraggio4	= 1;
-                        break;
-                    case 5:
-                        $ragazzo_row->stradadicoraggio5	= 1;
-                        break;
-                    default:
-                        \cli\out('invalid data strada1 : ' . $ragazzo->strada1 . "\n");
-                        $log->addError('['.$ragazzo->codicesocio.']'.'strada di coraggio 1 non valida : ' . $ragazzo->strada1);
-                        break;
-                }
-
-                switch($ragazzo->strada2){
-                    case 1:
-                        $ragazzo_row->stradadicoraggio1	= 1;
-                        break;
-                    case 2:
-                        $ragazzo_row->stradadicoraggio2	= 1;
-                        break;
-                    case 3:
-                        $ragazzo_row->stradadicoraggio3	= 1;
-                        break;
-                    case 4:
-                        $ragazzo_row->stradadicoraggio4	= 1;
-                        break;
-                    case 5:
-                        $ragazzo_row->stradadicoraggio5	= 1;
-                        break;
-                    default:
-                        \cli\out('invalid data strada2 : ' . $ragazzo->strada2 . "\n");
-                        $log->addError('['.$ragazzo->codicesocio.']'.'strada di coraggio 2 non valida : ' . $ragazzo->strada2);
-                        break;
-                }
-
-                switch($ragazzo->strada3){
-                    case 1:
-                        $ragazzo_row->stradadicoraggio1	= 1;
-                        break;
-                    case 2:
-                        $ragazzo_row->stradadicoraggio2	= 1;
-                        break;
-                    case 3:
-                        $ragazzo_row->stradadicoraggio3	= 1;
-                        break;
-                    case 4:
-                        $ragazzo_row->stradadicoraggio4	= 1;
-                        break;
-                    case 5:
-                        $ragazzo_row->stradadicoraggio5	= 1;
-                        break;
-                    default:
-                        \cli\out('invalid data strada3 : ' . $ragazzo->strada3 . "\n");
-                        $log->addError('['.$ragazzo->codicesocio.']'.'strada di coraggio 3 non valida : ' . $ragazzo->strada3);
-                        break;
-                }
-
-
-                $ragazzo_row->colazione = $ragazzo->colazione;
-
-                $ragazzo_row->alimentari = $ragazzo->alimentari;
-
-                if ( $ragazzo->intolleranzealimentari->presenti != 0 ){
-                    $ragazzo_row->intolleranzealimentari = $ragazzo->intolleranzealimentari->elenco;
-                } else {
-                    $ragazzo_row->intolleranzealimentari = NULL;
-                }
-
-                if ( $ragazzo->allergiealimentari->presenti != 0 ){
-                    $ragazzo_row->allergiealimentari = $ragazzo->allergiealimentari->elenco;
-                } else {
-                    $ragazzo_row->allergiealimentari = NULL;
-                }
-
-                if ( $ragazzo->allergiefarmaci->presenti != 0 ){
-                    $ragazzo_row->allergiefarmaci = $ragazzo->allergiefarmaci->elenco;
-                } else {
-                    $ragazzo_row->allergiefarmaci = NULL;
-                }
-
-                if ( $ragazzo->disabilita->presenti != 0 ){
-                    $ragazzo_row->sensoriali = $ragazzo->disabilita->sensoriali;
-                    $ragazzo_row->psichiche = $ragazzo->disabilita->psichiche;
-                    $ragazzo_row->lis = $ragazzo->disabilita->lis;
-                    $ragazzo_row->fisiche = $ragazzo->disabilita->fisiche;
-                } else {
-                    $ragazzo_row->sensoriali = NULL;
-                    $ragazzo_row->psichiche = NULL;
-                    $ragazzo_row->lis = NULL;
-                    $ragazzo_row->fisiche = NULL;
-                }
-
-                if ( $ragazzo->patologie->presenti != 0 ){
-                    $ragazzo_row->patologie = $ragazzo->patologie->descrizione;
-                } else {
-                    $ragazzo_row->patologie = NULL;
-                }
-
-                try {
-                    $id = R::store($ragazzo_row);
-                } catch(Exception $e){
-                    $log->addError($e->getMessage(), array('codice socio' => $ragazzo->codicesocio));
-                }
-
-            }
-        }
-    }
+    die("fine");
 
     if (isset($arguments_parsed['import-internal-lab'])) {
 
         $inputFileName = 'interni.xlsx';
-        if ( !empty($filename) ){
+        if ( !empty($filename) ) {
             $inputFileName = $filename;
         }
 
@@ -993,7 +207,6 @@ try {
 
                 $rowData = $sheet->rangeToArray('A' . $row_i . ':' . 'AT' . $row_i, NULL, TRUE, FALSE);
 
-
                 /*
                 $rowData = $sheet->rangeToArray('A' . $row_i . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
                 */
@@ -1001,13 +214,12 @@ try {
                 $row = $rowData[0];
 
                 /*
-                foreach ($row as $k => $v){
+                foreach ($row as $k => $v) {
                     //echo "Row: " . $row_i . "- Col: " . ($k + 1) . " = " . $v . "\n";
                 }
                 */
 
-
-                if ( !empty($row[2]) ){
+                if ( !empty($row[2]) ) {
                     $log->addInfo('Lab Interno '.$row_i, array('codicesocio' => $row[2], 'cognome' => $row[3], 'nome' => $row[4] , 'sesso' => $row[5] ));
 
                     $interni_row = R::dispense('interni');
@@ -1055,75 +267,68 @@ try {
                     $interni_row->note      							= $row[45]; //NOTE EMI
 
                     $id = R::store($interni_row);
-
                 }
 
             } catch (Exception $e) {
                 die('Error reading file "' . pathinfo($inputFileName, PATHINFO_BASENAME) . '": ' . $e->getMessage());
             }
         }
-
     }
 
     if ( isset($arguments_parsed['import-internal-rs']) ) {
 
         $inputFileName = 'labrs.xlsx';
-        if ( !empty($filename) ){
+        if ( !empty($filename) ) {
             $inputFileName = $filename;
         }
 
         excelFileParsing($inputFileName,'mapLaboratoriRS',2, $log, 'Lab Interno RS ');
-
     }
 
     if ( isset($arguments_parsed['import-tavole-rs']) ) {
 
         $inputFileName = 'tavolers.xlsx';
-        if ( !empty($filename) ){
+        if ( !empty($filename) ) {
             $inputFileName = $filename;
         }
 
         excelFileParsing($inputFileName,'mapTavoleRotondeRS',2, $log, 'Tavola Rotonda RS ');
-
     }
 
     if ( isset($arguments_parsed['import-veglie-rs']) ) {
 
         $inputFileName = 'vegliers.xlsx';
-        if ( !empty($filename) ){
+        if ( !empty($filename) ) {
             $inputFileName = $filename;
         }
 
         excelFileParsing($inputFileName,'mapVeglieRS',2, $log, 'Veglie RS ');
-
     }
 
     if ( isset($arguments_parsed['import-clan-lab']) ) {
 
         $inputFileName = 'laboratoriCodici.xlsx';
-        if ( !empty($filename) ){
+        if ( !empty($filename) ) {
             $inputFileName = $filename;
         }
 
         excelFileParsing($inputFileName,'mapVincoliCodici',2, $log, 'Vincoli Laboratorio Codici');
-
     }
 
     if ( isset($arguments_parsed['import-oneteam-offline']) ) {
 
         $inputFileName = 'gestioneOneTeam.xlsx';
-        if ( !empty($filename) ){
+        if ( !empty($filename) ) {
             $inputFileName = $filename;
         }
 
         excelFileParsing($inputFileName,'mapGestioneOneteam',2, $log, 'Gestione One Team gdoc');
-
     }
 
     if ( isset($arguments_parsed['import-ragazzi-internazionale']) ) {
 
         $inputFileName = 'stranieri.xlsx';
-        if ( !empty($filename) ){
+        if ( !empty($filename) ) {
             $inputFileName = $filename;
         }
 
@@ -1134,7 +339,7 @@ try {
     if (isset($arguments_parsed['import-external-lab'])) {
 
         $inputFileName = 'esterni.xlsx';
-        if ( !empty($filename) ){
+        if ( !empty($filename) ) {
             $inputFileName = $filename;
         }
 
@@ -1161,7 +366,7 @@ try {
 
                 $row = $rowData[0];
 
-                if ( !empty($row[4]) ){
+                if ( !empty($row[4]) ) {
                     $log->addInfo('Lab Esterno '.$row_i, array('titolo' => $row[4], 'aec' => $row[2], 'codicesocio' => $row[13] , 'email' => $row[16] ));
 
                     $esterni_row = R::dispense('esterni');
@@ -1222,7 +427,7 @@ try {
     if (isset($arguments_parsed['import-subarea'])) {
 
         $inputFileName = 'quartieri.xlsx';
-        if ( !empty($filename) ){
+        if ( !empty($filename) ) {
             $inputFileName = $filename;
         }
 
@@ -1249,7 +454,7 @@ try {
 
                 $row = $rowData[0];
 
-                if ( !empty($row[0]) ){
+                if ( !empty($row[0]) ) {
                     $log->addInfo('Quartiere '.$row_i, array('quartiere' => $row[0], 'aec' => $row[2], 'route' => $row[1]));
 
                     $quartiere_row = R::dispense('quartiere');
@@ -1276,7 +481,7 @@ try {
     if (isset($arguments_parsed['import-route'])) {
 
         $inputFileName = 'route.ods';
-        if ( !empty($filename) ){
+        if ( !empty($filename) ) {
             $inputFileName = $filename;
         }
 
@@ -1373,9 +578,7 @@ try {
     }
     */
 
-} catch (Exception $e){
+} catch (\Exception $e) {
     \cli\out('Error : ' . $e->getMessage(). "\n");
     exit - 1;
 }
-
-
