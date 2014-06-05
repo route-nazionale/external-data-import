@@ -129,8 +129,8 @@ class ProxyHelper
         while ($remoteObjects[0]->other == 'ok' && $i < $length) {
 
             $x = $from + $i;
-            $response = $this->client->remoteCall($this->baseUrl.'/getGruppiExtraAgesci/start/'.$x.'/token/'.$this->currentToken);
-            $remoteObjects = json_decode($this->decodeAES($response));
+            $remoteObjects = $this->client->remoteCall($this->baseUrl.'/getGruppiExtraAgesci/start/'.$x.'/token/'.$this->currentToken);
+
 
             if ( count($remoteObjects[0]->gruppi[0]) > 0 ) {
                 $remote_totali = array_merge($remote_totali,$remoteObjects[0]->gruppi);
