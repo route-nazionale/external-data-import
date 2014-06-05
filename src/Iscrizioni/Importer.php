@@ -8,7 +8,7 @@
 namespace Iscrizioni;
 
 use Psr\Log\LoggerInterface;
-use R;
+use RedBean_Facade as R;
 
 class Importer
 {
@@ -24,13 +24,22 @@ class Importer
         $this->log = $log;
     }
 
-    public function importGruppi($proxy, $all)
+    public function importGruppiExtraAgesci($proxy, $all)
     {
+        return $this->importGruppi($proxy, $all, false);
+    }
+
+    public function importGruppi($proxy, $all, $agesci = true)
+    {
+        $method = "getGruppi";
+        if (!$agesci) {
+            $method .= "ExtraAgesci";
+        }
         $i = 0;
         $running = true;
         while ($running) {
 
-            $gruppi = $proxy->getGruppi($i, 10);
+            $gruppi = call_user_func_array([$proxy,$method],[$i, 10]);
 
             if ($all) {
                 $gruppi_estratti = count($gruppi);
@@ -328,13 +337,17 @@ class Importer
      * @param $all
      * @return array
      */
-    public function importCapi($proxy, $all)
+    public function importCapi($proxy, $all, $agesci = true)
     {
+        $method = "getCapi";
+        if (!$agesci) {
+            $method .= "ExtraAgesci";
+        }
         $i = 0;
         $running = true;
         while ($running) {
 
-            $capi = $proxy->getCapi($i, 10);
+            $capi = call_user_func_array([$proxy,$method],[$i, 10]);
 
             //echo count($capi)."\n";
 
@@ -449,16 +462,18 @@ class Importer
      * @param $proxy
      * @param $all
      */
-    public function importRagazzi($proxy, $all)
+    public function importRagazzi($proxy, $all, $agesci = true)
     {
-        echo "ayea";
-        return ;
+        $method = "getRagazzi";
+        if (!$agesci) {
+            $method .= "ExtraAgesci";
+        }
 
         $i = 0;
         $running = true;
         while ($running) {
 
-            $ragazzi = $proxy->getRagazzi($i, 20);
+            $ragazzi = call_user_func_array([$proxy,$method],[$i, 10]);
 
             if ($all) {
                 $ragazzi_estratti = count($ragazzi);

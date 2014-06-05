@@ -33,6 +33,11 @@ $arguments->addFlag(array('import-extra', 'x'), 'Turn on import capi extra [API]
 $arguments->addFlag(array('import-oneteam', 'o'), 'Turn on import oneteam [API]');
 $arguments->addFlag(array('import-oneteam-offline', 'd'), 'Turn on import oneteam offline [FILE]');
 $arguments->addFlag(array('import-gruppi', 'g'), 'Turn on import gruppi [API]');
+
+$arguments->addFlag(array('import-ragazzi-extra', 'R'), 'Turn on import ragazzi extra Agesci [API]');
+$arguments->addFlag(array('import-capi-extra', 'C'), 'Turn on import capi extra Agesci [API]');
+$arguments->addFlag(array('import-gruppi-extra', 'G'), 'Turn on import gruppi extra Agesci [API]');
+
 $arguments->addFlag(array('import-external-lab', 'e'), 'Turn on import external lab [FILE]');
 $arguments->addFlag(array('import-internal-lab', 'i'), 'Turn on import internal lab [FILE]');
 
@@ -177,8 +182,6 @@ try {
 //            $importer->importRagazzi($proxy, $all);
 //        }
     }
-
-    die("fine");
 
     if (isset($arguments_parsed['import-internal-lab'])) {
 
