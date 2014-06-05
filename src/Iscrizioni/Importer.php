@@ -29,6 +29,16 @@ class Importer
         return $this->importGruppi($proxy, $all, false);
     }
 
+    public function importCapiExtraAgesci($proxy, $all)
+    {
+        return $this->importCapi($proxy, $all, false);
+    }
+
+    public function importRagazziExtraAgesci($proxy, $all)
+    {
+        return $this->importRagazzi($proxy, $all, false);
+    }
+
     public function importGruppi($proxy, $all, $agesci = true)
     {
         $method = "getGruppi";

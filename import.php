@@ -129,7 +129,6 @@ try {
         'import-capi-extra' => 'importCapiExtraAgesci',
         'import-ragazzi-extra' => 'importRagazziExtraAgesci',
     );
-    var_dump(array_intersect(array_keys($apiImportsFlags), $arguments_parsed));
 
     if ($apiImports = array_intersect_key($apiImportsFlags, $arguments_parsed)) {
 
@@ -152,35 +151,6 @@ try {
         foreach( $apiImports as $flag => $method) {
             call_user_func_array([$importer, $method ], [$proxy, $all]);
         }
-//        if (isset($arguments_parsed['import-gruppi'])) {
-//
-//            $importer->importGruppi($proxy, $all);
-//        }
-//
-//        if (isset($arguments_parsed['import-oneteam'])) {
-//
-//            $importer->importOneTeam($proxy, $all);
-//        }
-//
-//        if (isset($arguments_parsed['import-capolaboratorio'])) {
-//
-//            $importer->importCapiLaboratorio($proxy, $all);
-//        }
-//
-//        if (isset($arguments_parsed['import-extra'])) {
-//
-//            $importer->importExtra($proxy, $all);
-//        }
-//
-//        if (isset($arguments_parsed['import-capi'])) {
-//
-//            $importer->importCapi($proxy, $all);
-//        }
-//
-//        if (isset($arguments_parsed['import-ragazzi'])) {
-//
-//            $importer->importRagazzi($proxy, $all);
-//        }
     }
 
     if (isset($arguments_parsed['import-internal-lab'])) {
