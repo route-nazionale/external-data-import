@@ -72,7 +72,7 @@ class ProxyHelper
         }
 
         $i = count($remote_totali);
-        while ($remoteObjects[0]->other == 'ok' && $i < $length) {
+        while ( !empty($remoteObjects) && $remoteObjects[0]->other == 'ok' && $i < $length) {
 
             $x = $from + $i;
             $remoteObjects = $this->client->remoteCall($this->baseUrl.'/'.$getter.'/start/'.$x.'/token/'.$this->currentToken);
