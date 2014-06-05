@@ -67,7 +67,7 @@ class ProxyHelper
 
         $remote_totali = array();
 
-        if ( count($remoteObjects[0]->partecipanti[0]) > 0 ) {
+        if ( !empty($remoteObjects) && count($remoteObjects[0]->partecipanti[0]) > 0 ) {
             $remote_totali = array_merge($remote_totali,$remoteObjects[0]->partecipanti);
         }
 

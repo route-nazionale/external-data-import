@@ -148,7 +148,7 @@ try {
 
         $importer = new \Iscrizioni\Importer($log);
 
-        foreach( $apiImports as $flag => $method) {
+        foreach ($apiImports as $flag => $method) {
             call_user_func_array([$importer, $method ], [$proxy, $all]);
         }
     }
