@@ -9,6 +9,7 @@
 
 require 'vendor/autoload.php';
 require 'config.php';
+require 'src/functions.php';
 
 use RedBean_Facade as R;
 use Monolog\Logger;

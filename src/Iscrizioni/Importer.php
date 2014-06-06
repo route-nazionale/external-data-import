@@ -161,7 +161,7 @@ class Importer
 
             }
         }
-        return array($i, $running, $capi_estratti, $eta_capo);
+        return true;
     }
 
     /**
@@ -251,7 +251,7 @@ class Importer
 
             }
         }
-        return array($i, $running, $capi_estratti, $eta_capo);
+        return true;
     }
 
     /**
@@ -461,7 +461,7 @@ class Importer
                     $id = R::store($capo_row);
                 } catch (Exception $e) {
                     $this->log->addError($e->getMessage(), array('codice socio' => $capo->codicesocio));
-                    return $e;
+                    continue;
                 }
             }
         }
