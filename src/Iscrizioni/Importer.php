@@ -502,8 +502,9 @@ class Importer
                 $ragazzo_row->nome = $ragazzo->nome;
                 $ragazzo_row->cognome = $ragazzo->cognome;
 
-                $ragazzo_row->sesso = $ragazzo->sesso;
-
+                if($agesci) {
+                    $ragazzo_row->sesso = $ragazzo->sesso;
+                }
                 $ragazzo_row->datanascita = $ragazzo->datanascita;
 
                 $eta_ragazzo = getAge($ragazzo->datanascita); //Formato 1988-01-31 YYYY-MM-GG
