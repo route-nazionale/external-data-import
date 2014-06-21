@@ -62,18 +62,45 @@ function mapLaboratoriRS($row){
     if ( !empty($row[1]) ){
 
         $labrs_row = R::dispense('labrs');
-        $labrs_row->tipo    							= $row[0 ];
-        $labrs_row->nome								= $row[1 ];
-        $labrs_row->cognome								= $row[2 ];
-        $labrs_row->codicesocio 						= $row[3 ];
 
-        list($turnoS) = explode(" ",$row[6]);
-        $turno = intval($turnoS);
+        $labrs_row->gruppo    							= $row[2];
 
-        $labrs_row->turno								= $turno;
-        $labrs_row->turnodesc								= $row[6 ];
+        $labrs_row->code    							= $row[19];
+        $labrs_row->strada    							= $row[4 ];
+        $labrs_row->titolo								= $row[6 ];
+        $labrs_row->sentiero							= $row[5 ];
+        $labrs_row->obiettivo							= $row[7 ];
+
+        $labrs_row->nome								= $row[12];
+        $labrs_row->cognome								= $row[13];
+        $labrs_row->cellulare								= $row[14];
+        $labrs_row->email								= $row[15];
+
+        $labrs_row->turnounodesc								= $row[16 ];
+        $labrs_row->turnoduedesc								= $row[17 ];
+        $labrs_row->turnotredesc								= $row[18 ];
 
         $id = R::store($labrs_row);
+
+    }
+
+}
+
+function mapVincoliPersoneLaboratoriRS($row){
+
+    if ( !empty($row[1]) ){
+
+        $persone_laboratori_row = R::dispense('vincolilabrs');
+
+        $persone_laboratori_row->tipo    		= $row[0];
+        $persone_laboratori_row->nome    		= $row[1];
+        $persone_laboratori_row->cognome    	= $row[2];
+        $persone_laboratori_row->codicecensimento    	= $row[3];
+        $persone_laboratori_row->nomegruppo    	= $row[4];
+        $persone_laboratori_row->codicelab    	= $row[5];
+        $persone_laboratori_row->turno    	= $row[6];
+
+        $id = R::store($persone_laboratori_row);
 
     }
 
@@ -196,22 +223,20 @@ function mapTavoleRotondeRS($row){
 
         $tavolers_row = R::dispense('tavolers');
         $tavolers_row->code    							= $row[1 ];
-        $tavolers_row->stradadicoraggio                 = $row[3 ];
-        $tavolers_row->nomecognome							= $row[6 ];
-        $tavolers_row->telefono							= $row[7 ];
-        $tavolers_row->cellulare							= $row[8 ];
-        $tavolers_row->email							= $row[9 ];
+        $tavolers_row->stradadicoraggio                 = $row[6 ];
+        $tavolers_row->turno                            = $row[0 ];
 
-        $tavolers_row->titolo                        = $row[11 ];
-        $tavolers_row->obiettivi                        = $row[12 ];
+        $tavolers_row->titolo                           = $row[7 ];
+        $tavolers_row->descrizione                        = $row[8 ];
 
-        list($idgruppo, $idunita) =  explode(" ",$row[14 ]);
+        $tavolers_row->quartiere                        = $row[4 ];
+        $tavolers_row->nomeclan						    = $row[3 ];
 
-        $idunita = str_replace(')','',str_replace('(','',$idunita));
+        $tavolers_row->ospite						    = $row[2 ];
 
+        list($idgruppo, $idunita) =  explode("-",$row[11]);
         $tavolers_row->idgruppo 						= trim($idgruppo);
         $tavolers_row->idunita                          = trim($idunita);
-        $tavolers_row->nomeclan						    = $row[15 ];
 
         $id = R::store($tavolers_row);
 
@@ -360,6 +385,7 @@ $arguments->addFlag(array('import-external-lab', 'e'), 'Turn on import external 
 $arguments->addFlag(array('import-internal-lab', 'i'), 'Turn on import internal lab [FILE]');
 
 $arguments->addFlag(array('import-internal-rs', 'b'), 'Turn on import internal rs lab [FILE]');
+$arguments->addFlag(array('import-vincoli-rs', 'k'), 'Turn on import constraints rs lab [FILE]');
 $arguments->addFlag(array('import-tavole-rs', 't'), 'Turn on import tavole rs lab [FILE]');
 $arguments->addFlag(array('import-veglie-rs', 'n'), 'Turn on import veglie rs lab [FILE]');
 
@@ -1052,6 +1078,19 @@ try {
         excelFileParsing($inputFileName,'mapLaboratoriRS',2, $log, 'Lab Interno RS ');
 
     }
+
+    if ( isset($arguments_parsed['import-vincoli-rs']) ) {
+
+        $inputFileName = 'vincolilabrs.xlsx';
+        if ( !empty($filename) ){
+            $inputFileName = $filename;
+        }
+
+        excelFileParsing($inputFileName,'mapVincoliPersoneLaboratoriRS',2, $log, 'Vincoli lab RS');
+
+    }
+
+
 
     if ( isset($arguments_parsed['import-tavole-rs']) ) {
 
