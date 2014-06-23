@@ -259,7 +259,7 @@ function mapTavoleRotondeRSv2($row){
         $tavolers_row->nomegruppo						    = $row[17];
 
         //F 0279 T1
-        list($lettera,$ordinale, $idunita) =  explode(" ",$row[11]);
+        list($lettera,$ordinale,$idunita) =  explode(" ",$row[15]);
         $idgruppo = $lettera.$ordinale;
         $tavolers_row->idgruppo 						= trim($idgruppo);
         $tavolers_row->idunita                          = trim($idunita);
