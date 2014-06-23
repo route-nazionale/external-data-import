@@ -138,14 +138,14 @@ function mapLaboratoriEsterni($row){
         $esterni_row->correnteelettrica						= $row[20];									// corrente elettrica
         $esterni_row->spazi						            = $row[21];									// vincoli di spazio
         $esterni_row->labvicini						        = $row[22];									// laboratori vicini
-        $esterni_row->labperquartiere						= $row[23];									// 1 lab per qurtiere
-        $esterni_row->forniremateriali						= $row[24];									// fornire materiali
-        //$esterni_row->terzoanimatore						= $row[25];									// 3° animatore
-        $esterni_row->ospite						        = $row[26];									// ospite
-        $esterni_row->maxpartecipanti						= $row[27];									// limite partecipanti
-        $esterni_row->animatoredisabile						= $row[28];									// animatore disabile
-        $esterni_row->accompagnatori						= $row[29];									// accompagnatori
-        $esterni_row->nodisabili						    = $row[30];									// lab non adatto a disabili fisici
+
+        $esterni_row->forniremateriali						= $row[23];									// fornire materiali
+        //$esterni_row->terzoanimatore						= $row[24];									// 3° animatore
+        $esterni_row->ospite						        = $row[25];									// ospite
+        $esterni_row->maxpartecipanti						= $row[26];									// limite partecipanti
+        $esterni_row->animatoredisabile						= $row[27];									// animatore disabile
+        $esterni_row->accompagnatori						= $row[28];									// accompagnatori
+        $esterni_row->nodisabili						    = $row[29];									// lab non adatto a disabili fisici
 
 
         $id = R::store($esterni_row);
@@ -173,7 +173,7 @@ function mapLaboratoriInterni($row){
 
 
         $interni_row->stradacoraggio      					= $row[9]; //strada_coraggio
-        $interni_row->laboratorio      						= $row[10]; //laboratorio
+        $interni_row->titololaboratorio      						= $row[10]; //laboratorio
 
         $interni_row->fasciaeta      						= $row[11]; //fascia_eta
 
@@ -188,7 +188,7 @@ function mapLaboratoriInterni($row){
         $interni_row->cognomealtroanim      			    = $row[17]; //cognome_altro_anim
         $interni_row->emailaltroanim      					= $row[18]; //e_mail
         $interni_row->telefonoaltroanim      				= $row[19]; //telefono
-        $interni_row->cellularealtroanim      				= $row[20]; //telefono
+        $interni_row->cellularealtroanim      				= $row[20]; //cellulare
         $interni_row->pernottoaltroanim      				= $row[21]; //pernotto_2
         $interni_row->arrivoaltroanim     					= $row[22]; //arrivo_2
 
@@ -256,7 +256,9 @@ function mapTavoleRotondeRSv2($row){
         $tavolers_row->descrizione                        = $row[13];
 
         $tavolers_row->nomeclan						    = $row[16];
-        $tavolers_row->nomegruppo						    = $row[17];
+        $tavolers_row->nomegruppo						 = $row[17];
+
+        $tavolers_row->notanomegruppo				    = $row[5];
 
         //F 0279 T1
         list($lettera,$ordinale,$idunita) =  explode(" ",$row[15]);
@@ -505,11 +507,41 @@ try {
 
     if (isset($arguments_parsed['import-gruppi'])) {
 
+        //AGESCI
         $i = 0;
         $running = true;
         while($running){
 
             $gruppi = $proxy->getGruppi($i,10);
+
+            if ($all) {
+                $gruppi_estratti = count($gruppi);
+                $i += $gruppi_estratti;
+                if ( $gruppi_estratti < 10 ) $running = false;
+            } else {
+                $running = false;
+            }
+
+            foreach ($gruppi as $gruppo) {
+                $log->addInfo('Gruppo ', array('codice' => $gruppo->codice, 'nome' => $gruppo->nome, 'unita' => $gruppo->unita, 'regione' => $gruppo->regione));
+
+                $gruppo_row = R::dispense('gruppi');
+                $gruppo_row->idgruppo 		= $gruppo->codice;
+                $gruppo_row->nome 			= $gruppo->nome;
+                $gruppo_row->unita 			= $gruppo->unita;
+                $gruppo_row->regione 		= $gruppo->regione;
+                $id = R::store($gruppo_row);
+
+            }
+
+        }
+
+        //EXTRA
+        $i = 0;
+        $running = true;
+        while($running){
+
+            $gruppi = $proxy->getGruppiExtraAgesci($i,10);
 
             if ($all) {
                 $gruppi_estratti = count($gruppi);
