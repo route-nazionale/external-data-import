@@ -248,7 +248,7 @@ function mapTavoleRotondeRSv2($row){
 
     if ( !empty($row[0]) && !empty($row[1]) ){
 
-        $tavolers_row = R::dispense('tavolersV2');
+        $tavolers_row = R::dispense('tavolersvdue');
         $tavolers_row->code    							= $row[1 ];
         $tavolers_row->stradadicoraggio                 = $row[3 ];
 
