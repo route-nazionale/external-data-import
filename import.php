@@ -244,6 +244,32 @@ function mapTavoleRotondeRS($row){
 
 }
 
+function mapTavoleRotondeRSv2($row){
+
+    if ( !empty($row[0]) && !empty($row[1]) ){
+
+        $tavolers_row = R::dispense('tavolersV2');
+        $tavolers_row->code    							= $row[1 ];
+        $tavolers_row->stradadicoraggio                 = $row[3 ];
+
+        $tavolers_row->titolo                           = $row[12];
+        $tavolers_row->descrizione                        = $row[13];
+
+        $tavolers_row->nomeclan						    = $row[16];
+        $tavolers_row->nomegruppo						    = $row[17];
+
+        //F 0279 T1
+        list($lettera,$ordinale, $idunita) =  explode(" ",$row[11]);
+        $idgruppo = $lettera.$ordinale;
+        $tavolers_row->idgruppo 						= trim($idgruppo);
+        $tavolers_row->idunita                          = trim($idunita);
+
+        $id = R::store($tavolers_row);
+
+    }
+
+}
+
 function mapVeglieRS($row){
 
     if ( !empty($row[0]) ){
@@ -387,6 +413,7 @@ $arguments->addFlag(array('import-internal-lab', 'i'), 'Turn on import internal 
 $arguments->addFlag(array('import-internal-rs', 'b'), 'Turn on import internal rs lab [FILE]');
 $arguments->addFlag(array('import-vincoli-rs', 'k'), 'Turn on import constraints rs lab [FILE]');
 $arguments->addFlag(array('import-tavole-rs', 't'), 'Turn on import tavole rs lab [FILE]');
+$arguments->addFlag(array('import-tavole-rs-v2', 'X'), 'Turn on import tavole rs lab V2 [FILE]');
 $arguments->addFlag(array('import-veglie-rs', 'n'), 'Turn on import veglie rs lab [FILE]');
 
 $arguments->addFlag(array('import-subarea', 's'), 'Turn on import sub area [FILE]');
@@ -1090,7 +1117,16 @@ try {
 
     }
 
+    if ( isset($arguments_parsed['import-tavole-rs-v2']) ) {
 
+        $inputFileName = 'tavolersV2.xlsx';
+        if ( !empty($filename) ){
+            $inputFileName = $filename;
+        }
+
+        excelFileParsing($inputFileName,'mapTavoleRotondeRSv2',2, $log, 'Tavola Rotonda RS v2');
+
+    }
 
     if ( isset($arguments_parsed['import-tavole-rs']) ) {
 
