@@ -61,9 +61,29 @@ class ProxyHelper {
 
     }
 
-    public function getGruppi($from,$length){
+    public function getGruppiExtraAgesci($from,$length)
+    {
+        return $this->getGruppiDouble($from,$length,'getGruppiExtraAgesci');
+    }
 
-        $response = $this->remoteCall($this->baseUrl.'/getGruppi/start/'.$from.'/token/'.$this->currentToken);
+    public function getCapiExtraAgesci($from,$length)
+    {
+        return $this->remote_totali($from,$length,'getCapiExtraAgesci');
+    }
+
+    public function getRagazziExtraAgesci($from,$length)
+    {
+        return $this->remote_totali($from,$length,'getRagazziExtraAgesci');
+    }
+
+
+    public function getGruppi($from,$length){
+        return $this->getGruppiDouble($from,$length,'getGruppi');
+    }
+
+    private function getGruppiDouble($from,$length,$method){
+
+        $response = $this->remoteCall($this->baseUrl.'/'.$method.'/start/'.$from.'/token/'.$this->currentToken);
         $remoteObjects = json_decode($this->decodeAES($response));
 
         $remote_totali = array();
