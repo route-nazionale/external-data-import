@@ -935,6 +935,122 @@ try {
             }
         }
 
+        // EXTRA
+        $i = 0;
+        $running = true;
+        while($running){
+
+            $capi = $proxy->getCapiExtraAgesci($i,10);
+
+            //echo count($capi)."\n";
+
+            if ($all) {
+                $capi_estratti = count($capi);
+                $i += $capi_estratti;
+                if ( $capi_estratti < 10 ) $running = false;
+            } else {
+                $running = false;
+            }
+
+            foreach ($capi as $capo) {
+
+                $log->addInfo('Capo ', json_decode(json_encode($capo), true) );
+
+                $capo_row = R::dispense('capo');
+                $capo_row->codicecensimento	= $capo->codicesocio;
+                $capo_row->nome				= $capo->nome;
+                $capo_row->cognome			= $capo->cognome;
+                $capo_row->idgruppo			= $capo->gruppo;
+                $capo_row->idunitagruppo     = $capo->unita;
+
+                $capo_row->datanascita       = $capo->datanascita;
+
+                $eta_capo = getAge($capo->datanascita);//Formato 1988-01-31 YYYY-MM-GG
+                $capo_row->eta				= $eta_capo;
+
+                $capo_row->sesso             = $capo->sesso;
+
+                $recapiti = $capo->recapiti;
+
+                foreach($recapiti as $recapito) {
+
+                    if  ( !is_object($recapito)) {
+                        $log->addError('recapito invalido ',array('codice censimento' => $capo->codicesocio));
+                    } else {
+
+                        $log->addInfo("\t".'Recapito ', array('tipo' => $recapito->tipo, 'valore' => $recapito->valore));
+                        if ( $recapito->tipo == 'email' ){
+                            $capo_row->email = $recapito->valore;
+                        }
+                        if ( $recapito->tipo == 'cellulare' ) {
+                            $capo_row->cellulare = $recapito->valore;
+                        }
+                        if ( $recapito->tipo == 'abitazione' ) {
+                            if  ( is_numeric($recapito->valore) ) $capo_row->abitazione = $recapito->valore;
+                        }
+
+                    }
+
+                }
+
+                $residenza = $capo->residenza;
+                $log->addInfo("\t".'Residenza', array('citta' => $residenza->citta));
+                $capo_row->indirizzo    = $residenza->indirizzo;
+                $capo_row->cap          = $residenza->cap;
+                $capo_row->citta        = $residenza->citta;
+                $capo_row->provincia    = $residenza->provincia;
+
+                $capo_row->ruolo = $capo->ruolo;
+
+                $capo_row->colazione = $capo->colazione;
+
+                $capo_row->alimentari = $capo->alimentari;
+
+                if ( $capo->intolleranzealimentari->presenti != 0 ){
+                    $capo_row->intolleranzealimentari = $capo->intolleranzealimentari->elenco;
+                } else {
+                    $capo_row->intolleranzealimentari = NULL;
+                }
+
+                if ( $capo->allergiealimentari->presenti != 0 ){
+                    $capo_row->allergiealimentari = $capo->allergiealimentari->elenco;
+                } else {
+                    $capo_row->allergiealimentari = NULL;
+                }
+
+                if ( $capo->allergiefarmaci->presenti != 0 ){
+                    $capo_row->allergiefarmaci = $capo->allergiefarmaci->elenco;
+                } else {
+                    $capo_row->allergiefarmaci = NULL;
+                }
+
+                if ( $capo->disabilita->presenti != 0 ){
+                    $capo_row->sensoriali = $capo->disabilita->sensoriali;
+                    $capo_row->psichiche = $capo->disabilita->psichiche;
+                    $capo_row->lis = $capo->disabilita->lis;
+                    $capo_row->fisiche = $capo->disabilita->fisiche;
+                } else {
+                    $capo_row->sensoriali = NULL;
+                    $capo_row->psichiche = NULL;
+                    $capo_row->lis = NULL;
+                    $capo_row->fisiche = NULL;
+                }
+
+                if ( $capo->patologie->presenti != 0 ){
+                    $capo_row->patologie = $capo->patologie->descrizione;
+                } else {
+                    $capo_row->patologie = NULL;
+                }
+
+                try {
+                    $id = R::store($capo_row);
+                } catch(Exception $e){
+                    $log->addError($e->getMessage(), array('codice socio' => $capo->codicesocio));
+                }
+
+            }
+        }
+
     }
 
     if (isset($arguments_parsed['import-ragazzi'])) {
@@ -944,6 +1060,183 @@ try {
         while($running){
 
             $ragazzi = $proxy->getRagazzi($i,20);
+
+            if ($all) {
+                $ragazzi_estratti = count($ragazzi);
+                $i += $ragazzi_estratti;
+                if ( $ragazzi_estratti < 10 ) $running = false;
+            } else {
+                $running = false;
+            }
+
+            foreach ($ragazzi as $ragazzo) {
+
+                $log->addInfo('Ragazzo ', json_decode(json_encode($ragazzo), true) );
+
+                $ragazzo_row = R::dispense('ragazzo');
+                $ragazzo_row->codicecensimento	= $ragazzo->codicesocio;
+                $ragazzo_row->nome				= $ragazzo->nome;
+                $ragazzo_row->cognome			= $ragazzo->cognome;
+
+                $ragazzo_row->sesso             = $ragazzo->sesso;
+
+                $ragazzo_row->datanascita       = $ragazzo->datanascita;
+
+                $eta_ragazzo = getAge($ragazzo->datanascita);//Formato 1988-01-31 YYYY-MM-GG
+                $ragazzo_row->eta				= $eta_ragazzo;
+
+                $ragazzo_row->idgruppo			= $ragazzo->gruppo;
+                $ragazzo_row->idunitagruppo     = $ragazzo->unita;
+
+                switch($eta_ragazzo){
+                    case 13:
+                    case 14:
+                    case 15:
+                    case 16:
+                    case 17:
+                        $ragazzo_row->novizio			= 1; //da ricavare in base all'eta (16-17)
+                        break;
+                    case 18:
+                    case 19:
+                    case 20:
+                    case 21:
+                        $ragazzo_row->novizio			= 0; //da ricavare in base all'eta (16-17)
+                        break;
+                    default:
+                        \cli\out('['.$ragazzo->codicesocio.']'.'invalid age : ' . $eta_ragazzo . "\n");
+                        $log->addError('['.$ragazzo->codicesocio.']'.'invalid age : ' . $eta_ragazzo.' nato il '.$ragazzo->datanascita);
+                        $ragazzo_row->novizio			= 0;
+                        break;
+                }
+
+                $ragazzo_row->stradadicoraggio1	= 0;
+                $ragazzo_row->stradadicoraggio2	= 0;
+                $ragazzo_row->stradadicoraggio3	= 0;
+                $ragazzo_row->stradadicoraggio4	= 0;
+                $ragazzo_row->stradadicoraggio5	= 0;
+
+                switch($ragazzo->strada1){
+                    case 1:
+                        $ragazzo_row->stradadicoraggio1	= 1;
+                        break;
+                    case 2:
+                        $ragazzo_row->stradadicoraggio2	= 1;
+                        break;
+                    case 3:
+                        $ragazzo_row->stradadicoraggio3	= 1;
+                        break;
+                    case 4:
+                        $ragazzo_row->stradadicoraggio4	= 1;
+                        break;
+                    case 5:
+                        $ragazzo_row->stradadicoraggio5	= 1;
+                        break;
+                    default:
+                        \cli\out('invalid data strada1 : ' . $ragazzo->strada1 . "\n");
+                        $log->addError('['.$ragazzo->codicesocio.']'.'strada di coraggio 1 non valida : ' . $ragazzo->strada1);
+                        break;
+                }
+
+                switch($ragazzo->strada2){
+                    case 1:
+                        $ragazzo_row->stradadicoraggio1	= 1;
+                        break;
+                    case 2:
+                        $ragazzo_row->stradadicoraggio2	= 1;
+                        break;
+                    case 3:
+                        $ragazzo_row->stradadicoraggio3	= 1;
+                        break;
+                    case 4:
+                        $ragazzo_row->stradadicoraggio4	= 1;
+                        break;
+                    case 5:
+                        $ragazzo_row->stradadicoraggio5	= 1;
+                        break;
+                    default:
+                        \cli\out('invalid data strada2 : ' . $ragazzo->strada2 . "\n");
+                        $log->addError('['.$ragazzo->codicesocio.']'.'strada di coraggio 2 non valida : ' . $ragazzo->strada2);
+                        break;
+                }
+
+                switch($ragazzo->strada3){
+                    case 1:
+                        $ragazzo_row->stradadicoraggio1	= 1;
+                        break;
+                    case 2:
+                        $ragazzo_row->stradadicoraggio2	= 1;
+                        break;
+                    case 3:
+                        $ragazzo_row->stradadicoraggio3	= 1;
+                        break;
+                    case 4:
+                        $ragazzo_row->stradadicoraggio4	= 1;
+                        break;
+                    case 5:
+                        $ragazzo_row->stradadicoraggio5	= 1;
+                        break;
+                    default:
+                        \cli\out('invalid data strada3 : ' . $ragazzo->strada3 . "\n");
+                        $log->addError('['.$ragazzo->codicesocio.']'.'strada di coraggio 3 non valida : ' . $ragazzo->strada3);
+                        break;
+                }
+
+
+                $ragazzo_row->colazione = $ragazzo->colazione;
+
+                $ragazzo_row->alimentari = $ragazzo->alimentari;
+
+                if ( $ragazzo->intolleranzealimentari->presenti != 0 ){
+                    $ragazzo_row->intolleranzealimentari = $ragazzo->intolleranzealimentari->elenco;
+                } else {
+                    $ragazzo_row->intolleranzealimentari = NULL;
+                }
+
+                if ( $ragazzo->allergiealimentari->presenti != 0 ){
+                    $ragazzo_row->allergiealimentari = $ragazzo->allergiealimentari->elenco;
+                } else {
+                    $ragazzo_row->allergiealimentari = NULL;
+                }
+
+                if ( $ragazzo->allergiefarmaci->presenti != 0 ){
+                    $ragazzo_row->allergiefarmaci = $ragazzo->allergiefarmaci->elenco;
+                } else {
+                    $ragazzo_row->allergiefarmaci = NULL;
+                }
+
+                if ( $ragazzo->disabilita->presenti != 0 ){
+                    $ragazzo_row->sensoriali = $ragazzo->disabilita->sensoriali;
+                    $ragazzo_row->psichiche = $ragazzo->disabilita->psichiche;
+                    $ragazzo_row->lis = $ragazzo->disabilita->lis;
+                    $ragazzo_row->fisiche = $ragazzo->disabilita->fisiche;
+                } else {
+                    $ragazzo_row->sensoriali = NULL;
+                    $ragazzo_row->psichiche = NULL;
+                    $ragazzo_row->lis = NULL;
+                    $ragazzo_row->fisiche = NULL;
+                }
+
+                if ( $ragazzo->patologie->presenti != 0 ){
+                    $ragazzo_row->patologie = $ragazzo->patologie->descrizione;
+                } else {
+                    $ragazzo_row->patologie = NULL;
+                }
+
+                try {
+                    $id = R::store($ragazzo_row);
+                } catch(Exception $e){
+                    $log->addError($e->getMessage(), array('codice socio' => $ragazzo->codicesocio));
+                }
+
+            }
+        }
+
+        //EXTRA
+        $i = 0;
+        $running = true;
+        while($running){
+
+            $ragazzi = $proxy->getRagazziExtraAgesci($i,20);
 
             if ($all) {
                 $ragazzi_estratti = count($ragazzi);

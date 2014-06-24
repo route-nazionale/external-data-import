@@ -61,11 +61,6 @@ class ProxyHelper {
 
     }
 
-    public function getGruppiExtraAgesci($from,$length)
-    {
-        return $this->getGruppiDouble($from,$length,'getGruppiExtraAgesci');
-    }
-
     public function getCapiExtraAgesci($from,$length)
     {
         return $this->remote_totali($from,$length,'getCapiExtraAgesci');
@@ -76,9 +71,12 @@ class ProxyHelper {
         return $this->remote_totali($from,$length,'getRagazziExtraAgesci');
     }
 
-
     public function getGruppi($from,$length){
         return $this->getGruppiDouble($from,$length,'getGruppi');
+    }
+
+    public function getGruppiExtraAgesci($from,$length) {
+        return $this->getGruppiDouble($from,$length,'getGruppiExtraAgesci');
     }
 
     private function getGruppiDouble($from,$length,$method){
