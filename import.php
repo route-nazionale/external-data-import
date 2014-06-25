@@ -229,8 +229,8 @@ function mapTavoleRotondeRS($row){
         $tavolers_row->regione                          = $row[4 ];
 
         $tavolers_row->stradadicoraggio                 = $row[5 ];
-        $tavolers_row->titolo                           = $row[6 ];
-        $tavolers_row->descrizione                      = $row[7 ];
+        $tavolers_row->titolo                           = $row[7 ];
+        $tavolers_row->descrizione                      = $row[8 ];
 
         $tavolers_row->nomegruppi                        = $row[9 ];
         $tavolers_row->codcensrif                        = $row[10];
