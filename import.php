@@ -1255,7 +1255,8 @@ try {
                 $ragazzo_row->nome				= $ragazzo->nome;
                 $ragazzo_row->cognome			= $ragazzo->cognome;
 
-                $ragazzo_row->sesso             = $ragazzo->sesso;
+                // gli esterni non hanno sesso...
+                // $ragazzo_row->sesso             = $ragazzo->sesso;
 
                 $ragazzo_row->datanascita       = $ragazzo->datanascita;
 
