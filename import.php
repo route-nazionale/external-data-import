@@ -219,49 +219,29 @@ function mapLaboratoriInterni($row){
 
 function mapTavoleRotondeRS($row){
 
-    if ( !empty($row[0]) && !empty($row[1]) ){
+    if ( !empty($row[1]) ){
 
         $tavolers_row = R::dispense('tavolers');
-        $tavolers_row->code    							= $row[1 ];
-        $tavolers_row->stradadicoraggio                 = $row[6 ];
-        $tavolers_row->turno                            = $row[0 ];
-
-        $tavolers_row->titolo                           = $row[7 ];
-        $tavolers_row->descrizione                        = $row[8 ];
-
+        $tavolers_row->code    							= $row[2 ];
+        $tavolers_row->turno                            = $row[3 ];
         $tavolers_row->quartiere                        = $row[4 ];
-        $tavolers_row->nomeclan						    = $row[3 ];
 
-        $tavolers_row->ospite						    = $row[2 ];
+        $tavolers_row->regione                          = $row[5 ];
 
-        list($idgruppo, $idunita) =  explode("-",$row[11]);
-        $tavolers_row->idgruppo 						= trim($idgruppo);
-        $tavolers_row->idunita                          = trim($idunita);
+        $tavolers_row->stradadicoraggio                 = $row[6 ];
+        $tavolers_row->titolo                           = $row[8 ];
+        $tavolers_row->descrizione                      = $row[9 ];
 
-        $id = R::store($tavolers_row);
+        $tavolers_row->nomegruppi                        = $row[10];
+        $tavolers_row->codcensrif                        = $row[11];
 
-    }
-
-}
-
-function mapTavoleRotondeRSv2($row){
-
-    if ( !empty($row[0]) && !empty($row[1]) ){
-
-        $tavolers_row = R::dispense('tavolersvdue');
-        $tavolers_row->code    							= $row[1 ];
-        $tavolers_row->stradadicoraggio                 = $row[3 ];
-
-        $tavolers_row->titolo                           = $row[12];
-        $tavolers_row->descrizione                        = $row[13];
-
-        $tavolers_row->nomeclan						    = $row[16];
-        $tavolers_row->nomegruppo						 = $row[17];
-
-        $tavolers_row->notanomegruppo				    = $row[5];
+        $tavolers_row->nomerif                           = $row[12];
+        $tavolers_row->telrif                           = $row[13];
+        $tavolers_row->cellrif                          = $row[14];
+        $tavolers_row->mailrif                          = $row[15];
 
         //F 0279 T1
-        list($lettera,$ordinale,$idunita) =  explode(" ",$row[15]);
+        list($lettera,$ordinale,$idunita) =  explode(" ",$row[20]);
         $idgruppo = $lettera.$ordinale;
         $tavolers_row->idgruppo 						= trim($idgruppo);
         $tavolers_row->idunita                          = trim($idunita);
