@@ -94,7 +94,7 @@ class ProxyHelper {
         while ( $remoteObjects[0]->other == 'ok' && $i < $length ) {
 
             $x = $from + $i;
-            $response = $this->remoteCall($this->baseUrl.'/getGruppi/start/'.$x.'/token/'.$this->currentToken);
+            $response = $this->remoteCall($this->baseUrl.'/'.$method.'/start/'.$x.'/token/'.$this->currentToken);
             $remoteObjects = json_decode($this->decodeAES($response));
 
             if ( count($remoteObjects[0]->gruppi[0]) > 0 ) {
