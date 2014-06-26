@@ -222,7 +222,8 @@ function mapTavoleRotondeRS($row){
     if ( !empty($row[1]) ){
 
         $tavolers_row = R::dispense('tavolers');
-        $tavolers_row->code    							= $row[1 ];
+        $tavolers_row->code 					        = "DADEFINIRE";
+        $tavolers_row->segreteria 					    = $row[1 ];
         $tavolers_row->turno                            = $row[2 ];
         $tavolers_row->quartiere                        = $row[3 ];
 
@@ -368,6 +369,29 @@ function mapGestioneOneteam($row){
     }
 }
 
+function mapCapiClanStranieriFormazione($row){
+
+    if ( !empty($row[0]) ){
+
+        $cc_row = R::dispense('capiclanformazione');
+
+        $cc_row->route                 = $row[0 ];
+        $cc_row->cc                 = $row[1 ];
+        $cc_row->cc2                 = $row[2 ];
+        $cc_row->email                 = $row[3 ];
+        $cc_row->email2                 = $row[4 ];
+        $cc_row->clantutor              = $row[5 ];
+        $cc_row->clanospitante          = $row[6 ];
+        $cc_row->clanospitati           = $row[7 ];
+        $cc_row->add                    = $row[8 ];
+        $cc_row->n                      = $row[9 ];
+        $cc_row->entrata                = $row[10];
+        $cc_row->uscita                 = $row[11];
+
+        $id = R::store($cc_row);
+
+    }
+}
 
 $strict = in_array('--strict', $_SERVER['argv']);
 $arguments = new \cli\Arguments(compact('strict'));
@@ -401,6 +425,7 @@ $arguments->addFlag(array('import-veglie-rs', 'n'), 'Turn on import veglie rs la
 $arguments->addFlag(array('import-subarea', 's'), 'Turn on import sub area [FILE]');
 $arguments->addFlag(array('import-route', 'u'), 'Turn on import route definition [FILE]');
 $arguments->addFlag(array('import-ragazzi-internazionale', 'z'), 'Turn on import world ragazzi[FILE]');
+$arguments->addFlag(array('import-cc-internazionale', 'Z'), 'Turn on import world capi clan [FILE]');
 $arguments->addFlag(array('import-clan-lab', 'a'), 'Turn on import clan lab [FILE]');
 
 $arguments->parse();
@@ -1488,6 +1513,19 @@ try {
         excelFileParsing($inputFileName,'mapStranieri',2, $log, 'Iscrizioni stranieri');
 
     }
+
+    if ( isset($arguments_parsed['import-cc-internazionale']) ) {
+
+        $inputFileName = 'ccstranieri.xlsx';
+        if ( !empty($filename) ){
+            $inputFileName = $filename;
+        }
+
+        excelFileParsing($inputFileName,'mapCapiClanStranieriFormazione',2, $log, 'Iscrizioni cc stranieri');
+
+    }
+
+
 
     if (isset($arguments_parsed['import-external-lab'])) {
 
