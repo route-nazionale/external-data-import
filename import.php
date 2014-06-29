@@ -394,6 +394,52 @@ function mapCapiClanStranieriFormazione($row){
     }
 }
 
+function mapKinderheim($row){
+
+    if ( !empty($row[0]) ){
+
+        $kk_row = R::dispense('kinder');
+
+        $kk_row->nome						= $row[1 ];
+        $kk_row->cognome					= $row[2 ];
+        $kk_row->datan						= $row[3 ];
+        $kk_row->eta						= $row[4 ];
+        $kk_row->dal						= $row[5 ];
+        $kk_row->al							= $row[6 ];
+        $kk_row->presenzacampo				= $row[7 ];
+        $kk_row->codcensimento				= $row[8 ];
+        $kk_row->cognome1					= $row[9 ];
+        $kk_row->nome1						= $row[10];
+        $kk_row->codcensimento2				= $row[11];
+        $kk_row->cognome2					= $row[12];
+        $kk_row->nome2						= $row[13];
+        $kk_row->email						= $row[14];
+        $kk_row->cellulare					= $row[15];
+        $kk_row->ruologenitori				= $row[16];
+        $kk_row->soggiornogenitori			= $row[17];
+        $kk_row->dietaalimentare			= $row[18];
+        $kk_row->esigenzealimentari			= $row[19];
+        $kk_row->allergiealimentari			= $row[20];
+        $kk_row->descallergiealimentari		= $row[21];
+        $kk_row->intolleranzealimentari		= $row[22];
+        $kk_row->descintolleranzealimentari	= $row[23];
+        $kk_row->allergiefarmaci			= $row[24];
+        $kk_row->descallergiefarmaci		= $row[25];
+        $kk_row->disabilita					= $row[26];
+        $kk_row->patologie					= $row[27];
+        $kk_row->attenzioni					= $row[28];
+
+        $kk_row->privacy					= $row[30];
+        $kk_row->schedainformativa			= $row[31];
+
+
+        $id = R::store($kk_row);
+
+    }
+
+
+}
+
 $strict = in_array('--strict', $_SERVER['argv']);
 $arguments = new \cli\Arguments(compact('strict'));
 
