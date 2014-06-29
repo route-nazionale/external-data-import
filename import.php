@@ -463,6 +463,8 @@ $arguments->addFlag(array('import-gruppi', 'g'), 'Turn on import gruppi [API]');
 $arguments->addFlag(array('import-external-lab', 'e'), 'Turn on import external lab [FILE]');
 $arguments->addFlag(array('import-internal-lab', 'i'), 'Turn on import internal lab [FILE]');
 
+$arguments->addFlag(array('import-kinderheim', 'B'), 'Turn on import kinderheim [FILE]');
+
 $arguments->addFlag(array('import-internal-rs', 'b'), 'Turn on import internal rs lab [FILE]');
 $arguments->addFlag(array('import-vincoli-rs', 'k'), 'Turn on import constraints rs lab [FILE]');
 $arguments->addFlag(array('import-tavole-rs', 't'), 'Turn on import tavole rs lab [FILE]');
@@ -1586,6 +1588,17 @@ try {
         }
 
         excelFileParsing($inputFileName,'mapLaboratoriEsterni',2, $log, 'Lab Esterno ');
+
+    }
+
+    if (isset($arguments_parsed['import-kinderheim'])) {
+
+        $inputFileName = 'kinderheim.xlsx';
+        if ( !empty($filename) ){
+            $inputFileName = $filename;
+        }
+
+        excelFileParsing($inputFileName,'mapKinderheim',2, $log, 'Kinderheim ');
 
     }
 
