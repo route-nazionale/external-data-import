@@ -1093,6 +1093,7 @@ try {
                 $ragazzo_row->idgruppo			= $ragazzo->gruppo;
                 $ragazzo_row->idunitagruppo     = $ragazzo->unita;
 
+                /*
                 switch($eta_ragazzo){
                     case 13:
                     case 14:
@@ -1113,6 +1114,7 @@ try {
                         $ragazzo_row->novizio			= 0;
                         break;
                 }
+                */
 
                 $ragazzo_row->stradadicoraggio1	= 0;
                 $ragazzo_row->stradadicoraggio2	= 0;
@@ -1271,6 +1273,7 @@ try {
                 $ragazzo_row->idgruppo			= $ragazzo->gruppo;
                 $ragazzo_row->idunitagruppo     = $ragazzo->unita;
 
+                /*
                 switch($eta_ragazzo){
                     case 13:
                     case 14:
@@ -1291,6 +1294,7 @@ try {
                         $ragazzo_row->novizio			= 0;
                         break;
                 }
+                */
 
                 $ragazzo_row->stradadicoraggio1	= 0;
                 $ragazzo_row->stradadicoraggio2	= 0;
