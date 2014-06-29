@@ -387,6 +387,7 @@ function mapCapiClanStranieriFormazione($row){
         $cc_row->n                      = $row[9 ];
         $cc_row->entrata                = $row[10];
         $cc_row->uscita                 = $row[11];
+        $cc_row->idunita                = $row[12];
 
         $id = R::store($cc_row);
 
