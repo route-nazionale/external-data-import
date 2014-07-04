@@ -110,45 +110,52 @@ function mapLaboratoriEsterni($row){
 
     if ( !empty($row[0]) ){
 
-        $esterni_row = R::dispense('esterni');
-        $esterni_row->nprovvisorio							= $row[0 ];									//N. PROVVISORIO
-        $esterni_row->cronologia							= $row[1 ];									//Informazioni cronologiche
-        $esterni_row->regione								= $row[2 ];									//Regione di appartenenza
-        $esterni_row->aec									= $row[3 ];									//Associazione/Ente/Cooperativa<E2><80><A6>proponente
-        $esterni_row->stradacoraggio						= $row[4 ];									//Strada di Coraggio
-        $esterni_row->titolo								= $row[5 ];									//Titolo laboratorio
+        $row_esterno = R::dispense('esterni');
 
-        $esterni_row->limiti								= $row[6 ];									//Laboratorio adatto a ragazzi di:
-        $esterni_row->materiali								= $row[7 ];									//Intendo spedire materiali
+        $row_esterno->X						= $row[0 ];	//0
+        $row_esterno->info					= $row[1 ];	//Informazioni cronologiche
+        $row_esterno->regione				= $row[2 ];	//Regione di appartenenza
+        $row_esterno->associazione			= $row[3 ];	//Associazione/Ente/Cooperativa…proponente
+        $row_esterno->stradacoraggio			= $row[4 ];	//Strada di Coraggio
+        $row_esterno->titolo					= $row[5 ];	//Titolo laboratorio
+        $row_esterno->fascieeta				= $row[6 ];	//Laboratorio adatto a ragazzi di:
+        $row_esterno->materiali				= $row[7 ];	//Intendo spedire i materiali
+        $row_esterno->quota					= $row[8 ];	//Quota €
+        $row_esterno->codicesocio			= $row[9 ];	//codice socio
+        $row_esterno->nome					= $row[10];	//	Nome
+        $row_esterno->cognome				= $row[11];	//	Cognome
+        $row_esterno->email					= $row[12];	//	E-mail
+        $row_esterno->telefono				= $row[13];	//	Telefono/Cell
+        $row_esterno->pernotto				= $row[14];	//	Pernottamento in
+        $row_esterno->quota2				= $row[15];	//	Quota €
+        $row_esterno->codicesocio2			= $row[16];	//	codice socio
+        $row_esterno->nome2					= $row[17];	//	Nome
+        $row_esterno->cognome2				= $row[18];	//	Cognome
+        $row_esterno->email2					= $row[19];	//	E-mail
+        $row_esterno->telefono2				= $row[20];	//	Telefono/Cell
+        $row_esterno->pernotto2				= $row[21];	//	Pernottamento in
+        $row_esterno->quota3					= $row[22];	//	3°animatore Quota €
+        $row_esterno->codicesocio3			= $row[23];	//	3°animatore Codice_socio
+        $row_esterno->nome3					= $row[24];	//	3°animatore nome
+        $row_esterno->cognome3				= $row[25];	//	3°animatore cognome
+        $row_esterno->email3					= $row[26];	//	3°animatore_mail
+        $row_esterno->telefono3				= $row[27];	//	3°animatore cell.
+        $row_esterno->accompagnatorenome		= $row[28];	//	OSPITE/ACCOMPAGNATORE NOME
+        $row_esterno->accompagnatorecognome	= $row[29];	//	OSPITE/ACCOMPAGNATORE COGNOME
+        $row_esterno->accompagnatoremail		= $row[30];	//	OSPITE/ACCOMPAGNATORE MAIL
+        $row_esterno->accompagnatorecell		= $row[31];	//	OSPITE/ACCOMPAGNATORE CELL.
+        $row_esterno->corrente				= $row[32];	//	corrente elettrica
+        $row_esterno->vincoli				= $row[33];	//	vincoli di spazio
+        $row_esterno->labvicini				= $row[34];	//	laboratori vicini
+        $row_esterno->materialefornito		= $row[35];	//	fornire materiali
+        $row_esterno->animatore3				= $row[36];	//	3° animatore
+        $row_esterno->ospite					= $row[37];	//	ospite
+        $row_esterno->limitepartecipanti		= $row[38];	//	limite partecipanti
+        $row_esterno->animatoredisabile		= $row[39];	//	animatore disabile
+        $row_esterno->accompagnatori			= $row[40];	//	accompagnatori
+        $row_esterno->disabilita				= $row[41];	//	lab non adatto a disabili fisici
 
-        $esterni_row->codicesocio							= $row[8 ];									// codice socio
-        $esterni_row->nome									= $row[9];									// Nome
-        $esterni_row->cognome								= $row[10];									// Cognome
-        $esterni_row->email									= $row[11];									// E-mail
-        $esterni_row->telefono								= $row[12];									// Telefono/Cell
-        $esterni_row->pernotto								= $row[13];									// Pernottamento in
-
-        $esterni_row->codicesocioaltroanim					= $row[14];									// codice socio
-        $esterni_row->nomealtroanim							= $row[15];									// Nome
-        $esterni_row->cognomealtroanim						= $row[16];									// Cognome
-        $esterni_row->emailaltroanim						= $row[17];									// E-mail
-        $esterni_row->telefonoaltroanim						= $row[18];									// Telefono/Cell
-        $esterni_row->pernottoaltroanim						= $row[19];									// Pernottamento in
-
-        $esterni_row->correnteelettrica						= $row[20];									// corrente elettrica
-        $esterni_row->spazi						            = $row[21];									// vincoli di spazio
-        $esterni_row->labvicini						        = $row[22];									// laboratori vicini
-
-        $esterni_row->forniremateriali						= $row[23];									// fornire materiali
-        //$esterni_row->terzoanimatore						= $row[24];									// 3° animatore
-        $esterni_row->ospite						        = $row[25];									// ospite
-        $esterni_row->maxpartecipanti						= $row[26];									// limite partecipanti
-        $esterni_row->animatoredisabile						= $row[27];									// animatore disabile
-        $esterni_row->accompagnatori						= $row[28];									// accompagnatori
-        $esterni_row->nodisabili						    = $row[29];									// lab non adatto a disabili fisici
-
-
-        $id = R::store($esterni_row);
+        $id = R::store($row_esterno);
 
     }
 
@@ -156,66 +163,155 @@ function mapLaboratoriEsterni($row){
 
 function mapLaboratoriInterni($row){
 
-    if ( !empty($row[0]) ){
+    if ( !empty($row[3]) ){
 
-        $interni_row = R::dispense('interni');
-        $interni_row->codice								    = $row[0 ]; //codice
+        $row_interni = R::dispense('interni');
 
-        $interni_row->codicesocio						    = $row[1 ]; //codice_socio
-        $interni_row->cognome      							= $row[2 ]; //Cognome
-        $interni_row->nome      							= $row[3 ]; //Nome
+        $row_interni->X							= $row[0 ]; //	0
+        $row_interni->quota						= $row[1 ]; //	Quota €
+        $row_interni->codicesocio				= $row[2 ]; //	codice_socio
+        $row_interni->nome						= $row[3 ]; //	Cognome
+        $row_interni->cognome					= $row[4 ]; //	Nome
+        $row_interni->residenza					= $row[5 ]; //	residenza
+        $row_interni->prov						= $row[6 ]; //	prov
+        $row_interni->telefono					= $row[7 ]; //	tel
+        $row_interni->cellulare					= $row[8 ]; //	cell
+        $row_interni->email						= $row[9 ]; //	email
+        $row_interni->stradacoraggio			= $row[10]; //		strada_coraggio
+        $row_interni->titolo					= $row[11]; //		laboratorio
+        $row_interni->fascieeta					= $row[12]; //		fascia_eta
+        $row_interni->materiali					= $row[13]; //		spedizione_materiali
+        $row_interni->pernotto					= $row[14]; //		pernotto
+        $row_interni->arrivo					= $row[15]; //		arrivo
+        $row_interni->quota2					= $row[16]; //		Quota €
+        $row_interni->codicesocio2				= $row[17]; //		Codice_socio
+        $row_interni->nome2						= $row[18]; //		nome_altro_anim
+        $row_interni->cognome2					= $row[19]; //		cognome_altro_anim
+        $row_interni->email2					= $row[20]; //		e_mail
+        $row_interni->telefono2					= $row[21]; //		telefono_altro_anim
+        $row_interni->cellulare2				= $row[22]; //		cellulare_altro_anim
+        $row_interni->pernotto2					= $row[23]; //		pernotto_2
+        $row_interni->arrivo2					= $row[24]; //		arrivo_2
+        $row_interni->DataProtocollo			= $row[25]; //		Data_Protocollo
+        $row_interni->nomegruppo				= $row[26]; //		NOMEGRUPPO
+        $row_interni->nomezona					= $row[27]; //		NOMEZONA
+        $row_interni->nomereg					= $row[28]; //		NOMEREG
+        $row_interni->quota3					= $row[29]; //		3°animatore Quota €
+        $row_interni->codicesocio3				= $row[30]; //		3°animatore Codice_socio
+        $row_interni->nome3						= $row[31]; //		3°animatore nome
+        $row_interni->cognome3					= $row[32]; //		3°animatore cognome
+        $row_interni->email3					= $row[33]; //		3°animatore_mail
+        $row_interni->telefono3					= $row[34]; //		3°animatore cell.
+        $row_interni->accompagnatorenome		= $row[35]; //		OSPITE/ACCOMPAGNATORE NOME
+        $row_interni->accompagnatorecognome		= $row[36]; //		OSPITE/ACCOMPAGNATORE COGNOME
+        $row_interni->accompagnatoremail		= $row[37]; //		OSPITE/ACCOMPAGNATORE MAIL
+        $row_interni->accompagnatorecell		= $row[38]; //		OSPITE/ACCOMPAGNATORE CELL.
+        $row_interni->corrente					= $row[39]; //		corrente elettrica
+        $row_interni->vincoli					= $row[40]; //		vincoli di spazio
+        $row_interni->labvicini					= $row[41]; //		laboratori vicini
+        $row_interni->materialefornito			= $row[42]; //		fornire materiali
+        $row_interni->XX						= $row[43]; //
+        $row_interni->animatore3				= $row[44]; //		3° animatore
+        $row_interni->ospite					= $row[45]; //		ospite
+        $row_interni->limitepartecipanti		= $row[46]; //		limite partecipanti
+        $row_interni->animatoredisabile			= $row[47]; //		animatore disabile
+        $row_interni->accompagnatori			= $row[48]; //		accompagnatori
+        $row_interni->disabilita				= $row[49]; //		lab non adatto a disabili fisici
 
-        $interni_row->residenza      						= $row[4]; //residenza
-        $interni_row->prov      							= $row[5]; //prov
-        $interni_row->tel      							    = $row[6]; //tel
-        $interni_row->cell      							= $row[7]; //cell
-        $interni_row->email      							= $row[8]; //email
-
-
-        $interni_row->stradacoraggio      					= $row[9]; //strada_coraggio
-        $interni_row->titololaboratorio      						= $row[10]; //laboratorio
-
-        $interni_row->fasciaeta      						= $row[11]; //fascia_eta
-
-
-        $interni_row->spedizionemateriali      				= $row[12]; //spedizione_materiali
-
-        $interni_row->pernotto      						= $row[13]; //pernotto
-        $interni_row->arrivo      							= $row[14]; //arrivo
-
-        $interni_row->codicesocioaltroanim      			= $row[15]; //Codice_socio_nome_altro_anim
-        $interni_row->nomealtroanim      				    = $row[16]; //nome_altro_anim
-        $interni_row->cognomealtroanim      			    = $row[17]; //cognome_altro_anim
-        $interni_row->emailaltroanim      					= $row[18]; //e_mail
-        $interni_row->telefonoaltroanim      				= $row[19]; //telefono
-        $interni_row->cellularealtroanim      				= $row[20]; //cellulare
-        $interni_row->pernottoaltroanim      				= $row[21]; //pernotto_2
-        $interni_row->arrivoaltroanim     					= $row[22]; //arrivo_2
-
-        $interni_row->dataprotocolloaltroanim      			= $row[23]; //Data_Protocollo
-        $interni_row->nomegruppo      						= $row[24]; //NOMEGRUPPO
-        $interni_row->nomezona     							= $row[25]; //NOMEZONA
-        $interni_row->nomereg      							= $row[26]; //NOMEREG
-
-
-        //corrente elettrica
-        //vincoli di spazio
-        //laboratori vicini
-        //fornire materiali
-        //lab lontani (1 per quartiere)
-        //3° animatore
-        $interni_row->ospite      							= $row[33]; //ospite
-        $interni_row->maxpartecipanti      					= $row[34]; //limite partecipanti
-        //animatore disabile
-        //accompagnatori
-        $interni_row->nodisabili      						= $row[37]; //lab non adatto a disabili fisici
-        //con accesso Arno
-
-        $id = R::store($interni_row);
+        $id = R::store($row_interni);
 
     }
 
 }
+
+function mapAnimatoriEsterni($row){
+
+    if ( !empty($row[3]) ){
+
+        $animatore_lab = R::dispense('animatorilab');
+
+        $animatore_lab->num				=intval($row[0])+5000; //	n. ( va sommato 5000)
+        $animatore_lab->codsocio		=$row[1]; //	codice socio
+        $animatore_lab->nome			=$row[2]; //	Nome
+        $animatore_lab->cognome			=$row[3]; //	Cognome
+        $animatore_lab->email			=$row[4]; //	E-mail
+        $animatore_lab->telefono		=$row[5]; //	Telefono/Cell
+        $animatore_lab->pernotto		=$row[6]; //	Pernottamento in
+        $animatore_lab->quota			=$row[7]; //	Quota €
+        $animatore_lab->animatore		=$row[8]; //	animatore
+
+        $id = R::store($animatore_lab);
+    }
+
+}
+
+function mapAnimatoriInterni($row){
+
+    if ( !empty($row[3]) ){
+
+        $animatore_lab = R::dispense('animatorilab');
+
+        $animatore_lab->num			=$row[0	]; //n.
+        $animatore_lab->codsocio	=$row[1	]; //codice_socio
+        $animatore_lab->cognome		=$row[2	]; //Cognome
+        $animatore_lab->nome		=$row[3	]; //Nome
+        $animatore_lab->residenza	=$row[4	]; //residenza
+        $animatore_lab->prov		=$row[5	]; //prov
+        $animatore_lab->telefono	=$row[6	]; //tel
+        $animatore_lab->cell		=$row[7	]; //cell
+        $animatore_lab->email		=$row[8	]; //email
+        $animatore_lab->quota		=$row[9	]; //Quota €
+        $animatore_lab->pernotto	=$row[10]; //pernotto
+        $animatore_lab->arrivo		=$row[11]; //arrivo
+        $animatore_lab->animatore	=$row[12]; //animatore
+
+        $id = R::store($animatore_lab);
+
+    }
+
+
+}
+
+function mapDecodeAnimatoriEsterniLab($row){
+
+    if ( !empty($row[3]) ){
+
+        $lab_esterno = R::dispense('laboratoriosum');
+
+        $lab_esterno->num				=$row[0]; //	n. (giusto gia 5000)
+        $lab_esterno->regass			=$row[1]; //	Regione di appartenenza
+        $lab_esterno->associazione		=$row[2]; //	Associazione/Ente/Cooperativa…proponente
+        $lab_esterno->strada			=$row[3]; //	Strada di Coraggio
+        $lab_esterno->lab				=$row[4]; //	Titolo laboratorio
+        $lab_esterno->fasciaeta			=$row[5]; // 	Laboratorio adatto a ragazzi di:
+        $lab_esterno->materialiped		=$row[6]; //	Intendo spedire i materiali
+        $lab_esterno->tipo = 'esterno';
+
+        $id = R::store($lab_esterno);
+
+    }
+
+}
+
+function mapDecodeAnimatoriInterniLab($row){
+
+    if ( !empty($row[3]) ){
+
+        $lab_interno = R::dispense('laboratoriosum');
+
+        $lab_interno->num				=$row[0];	//n.
+        $lab_interno->strada			=$row[1];	//strada_coraggio
+        $lab_interno->lab				=$row[2];	//laboratorio
+        $lab_interno->fasciaeta		=$row[3];	//fascia_eta
+        $lab_interno->materialiped	=$row[4];	//spedizione_materiali
+        $lab_esterno->tipo = 'interno';
+
+        $id = R::store($lab_interno);
+
+    }
+
+}
+
 
 function mapTavoleRotondeRS($row){
 
@@ -460,6 +556,7 @@ $arguments->addFlag(array('import-extra', 'x'), 'Turn on import capi extra [API]
 $arguments->addFlag(array('import-oneteam', 'o'), 'Turn on import oneteam [API]');
 $arguments->addFlag(array('import-oneteam-offline', 'd'), 'Turn on import oneteam offline [FILE]');
 $arguments->addFlag(array('import-gruppi', 'g'), 'Turn on import gruppi [API]');
+
 $arguments->addFlag(array('import-external-lab', 'e'), 'Turn on import external lab [FILE]');
 $arguments->addFlag(array('import-internal-lab', 'i'), 'Turn on import internal lab [FILE]');
 
@@ -1475,7 +1572,7 @@ try {
             $inputFileName = $filename;
         }
 
-        excelFileParsing($inputFileName,'mapLaboratoriInterni',2, $log, 'Lab Esterno ');
+        excelFileParsing($inputFileName,'mapLaboratoriInterni',2, $log, 'Lab Interno ');
 
     }
 
@@ -1699,6 +1796,13 @@ try {
                 $gemellaggio_row->gruppo			 = $row[4];    // Gruppo_dove_svolge_servizio
                 $gemellaggio_row->ordgruppo		     = $row[5];    // ordinale gruppo dove svolge servizio (decregione + ordinalegruppo = idgruppo)
                 $gemellaggio_row->idunita			 = $row[6];    // unita_servizio
+
+                if ( $row[3] == 'WW' ) { // gruppi stranieri ordinale prefissato
+                    $gemellaggio_row->ordgruppo = 99001;
+                    $gemellaggio_row->idunita = 'TXX';
+                }
+
+
                 $gemellaggio_row->cognome			 = $row[7];    // Cognome
                 $gemellaggio_row->nome			     = $row[8];    // Nome
                 $gemellaggio_row->email			     = $row[9];    // e-mail
