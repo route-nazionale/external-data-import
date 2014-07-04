@@ -304,7 +304,7 @@ function mapDecodeAnimatoriInterniLab($row){
         $lab_interno->lab				=$row[2];	//laboratorio
         $lab_interno->fasciaeta		=$row[3];	//fascia_eta
         $lab_interno->materialiped	=$row[4];	//spedizione_materiali
-        $lab_esterno->tipo = 'interno';
+        $lab_interno->tipo = 'interno';
 
         $id = R::store($lab_interno);
 
