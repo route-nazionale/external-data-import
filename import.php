@@ -22,7 +22,7 @@ function getAge($birthday)
     return $diff->format('%y');
 }
 
-function excelFileParsing($inputFileName, $funMap, $from_row_number, $log, $desc) {
+function excelFileParsing($inputFileName, $funMap, $from_row_number, $log, $desc,$sheetNumber = 0) {
     //  Read your Excel workbook
     try {
         $inputFileType = PHPExcel_IOFactory::identify($inputFileName);
@@ -33,7 +33,7 @@ function excelFileParsing($inputFileName, $funMap, $from_row_number, $log, $desc
     }
 
     //  Get worksheet dimensions
-    $sheet = $objPHPExcel->getSheet(0);
+    $sheet = $objPHPExcel->getSheet($sheetNumber);
     $highestRow = $sheet->getHighestRow();
     $highestColumn = $sheet->getHighestColumn();
 
@@ -573,6 +573,10 @@ $arguments->addFlag(array('import-route', 'u'), 'Turn on import route definition
 $arguments->addFlag(array('import-ragazzi-internazionale', 'z'), 'Turn on import world ragazzi[FILE]');
 $arguments->addFlag(array('import-cc-internazionale', 'Z'), 'Turn on import world capi clan [FILE]');
 $arguments->addFlag(array('import-clan-lab', 'a'), 'Turn on import clan lab [FILE]');
+
+$arguments->addFlag(array('import-animatori-lab-interni', 'I'), 'Turn on import animatori lab [FILE]');
+$arguments->addFlag(array('import-animatori-lab-esterni', 'E'), 'Turn on import animatori lab [FILE]');
+
 
 $arguments->parse();
 if ($arguments['help']) {
@@ -1675,8 +1679,6 @@ try {
 
     }
 
-
-
     if (isset($arguments_parsed['import-external-lab'])) {
 
         $inputFileName = 'esterni.xlsx';
@@ -1823,6 +1825,41 @@ try {
         }
 
     }
+
+
+
+    if (isset($arguments_parsed['import-animatori-lab-interni'])) {
+
+        $inputFileName = 'animatoriInterni.xlsx';
+        if ( !empty($filename) ){
+            $inputFileName = $filename;
+        }
+
+        excelFileParsing($inputFileName,'mapDecodeAnimatoriInterniLab',2, $log, 'Titoli',0);
+
+        excelFileParsing($inputFileName,'mapAnimatoriInterni',2, $log, 'Lab primo animatore interno ',1);
+
+        excelFileParsing($inputFileName,'mapAnimatoriInterni',2, $log, 'Lab secondo animatore interno ',2);
+
+    }
+
+    if (isset($arguments_parsed['import-animatori-lab-esterni'])) {
+
+        $inputFileName = 'animatoriEsterni.xlsx';
+        if ( !empty($filename) ){
+            $inputFileName = $filename;
+        }
+
+        excelFileParsing($inputFileName,'mapDecodeAnimatoriEsterniLab',2, $log, 'Titoli',0);
+
+        excelFileParsing($inputFileName,'mapAnimatoriEsterni',2, $log, 'Lab primo animatore interno ',1);
+
+        excelFileParsing($inputFileName,'mapAnimatoriEsterni',2, $log, 'Lab secondo animatore interno ',2);
+
+    }
+
+
+
 
 } catch (Exception $e){
     \cli\out('Error : ' . $e->getMessage(). "\n");
