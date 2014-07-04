@@ -280,9 +280,9 @@ function mapAnimatoriInterniDue($row){
         $animatore_lab->codsocio	=$row[1	]; //Codice_socio
         $animatore_lab->cognome		=$row[2	]; //cognome_altro_anim
         $animatore_lab->nome		=$row[3	]; //nome_altro_anim
-        $animatore_lab->emil		=$row[4	]; //e_mail
+        $animatore_lab->email		=$row[4	]; //e_mail
         $animatore_lab->telefono	=$row[5	]; //telefono_altro_anim
-        $animatore_lab->cellulare	=$row[6	]; //cellulare_altro_anim
+        $animatore_lab->cell	    =$row[6	]; //cellulare_altro_anim
         $animatore_lab->quota		=$row[7	]; //Quota €
         $animatore_lab->pernotto	=$row[8	]; //pernotto_2
         $animatore_lab->arrivo		=$row[9	]; //arrivo_2
