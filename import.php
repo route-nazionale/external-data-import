@@ -268,8 +268,29 @@ function mapAnimatoriInterni($row){
         $id = R::store($animatore_lab);
 
     }
+}
 
+function mapAnimatoriInterniDue($row){
 
+    if ( !empty($row[3]) ){
+
+        $animatore_lab = R::dispense('animatorilab');
+
+        $animatore_lab->num			=$row[0	]; //n.
+        $animatore_lab->codsocio	=$row[1	]; //Codice_socio
+        $animatore_lab->cognome		=$row[2	]; //cognome_altro_anim
+        $animatore_lab->nome		=$row[3	]; //nome_altro_anim
+        $animatore_lab->emil		=$row[4	]; //e_mail
+        $animatore_lab->telefono	=$row[5	]; //telefono_altro_anim
+        $animatore_lab->cellulare	=$row[6	]; //cellulare_altro_anim
+        $animatore_lab->quota		=$row[7	]; //Quota €
+        $animatore_lab->pernotto	=$row[8	]; //pernotto_2
+        $animatore_lab->arrivo		=$row[9	]; //arrivo_2
+        $animatore_lab->animatore	=$row[10]; //animatore
+
+        $id = R::store($animatore_lab);
+
+    }
 }
 
 function mapDecodeAnimatoriEsterniLab($row){
@@ -1839,7 +1860,7 @@ try {
 
         excelFileParsing($inputFileName,'mapAnimatoriInterni',2, $log, 'Lab primo animatore interno ',1);
 
-        excelFileParsing($inputFileName,'mapAnimatoriInterni',2, $log, 'Lab secondo animatore interno ',2);
+        excelFileParsing($inputFileName,'mapAnimatoriInterniDue',2, $log, 'Lab secondo animatore interno ',2);
 
     }
 
