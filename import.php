@@ -108,7 +108,7 @@ function mapVincoliPersoneLaboratoriRS($row){
 
 function mapLaboratoriEsterni($row){
 
-    if ( !empty($row[0]) ){
+    if ( !empty($row[4]) ){
 
         $row_esterno = R::dispense('esterni');
 
