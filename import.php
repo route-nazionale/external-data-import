@@ -65,7 +65,7 @@ function mapLaboratoriRS($row){
 
         $labrs_row->gruppo    							= $row[2];
 
-        $labrs_row->code    							= $row[19];
+        if ( isset($row[19]) ) $labrs_row->code    		= $row[19];
         $labrs_row->strada    							= $row[4 ];
         $labrs_row->titolo								= $row[6 ];
         $labrs_row->sentiero							= $row[5 ];
@@ -332,7 +332,6 @@ function mapDecodeAnimatoriInterniLab($row){
     }
 
 }
-
 
 function mapTavoleRotondeRS($row){
 
