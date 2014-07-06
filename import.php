@@ -170,8 +170,8 @@ function mapLaboratoriInterni($row){
         $row_interni->X							= $row[0 ]; //	0
         $row_interni->quota						= $row[1 ]; //	Quota €
         $row_interni->codicesocio				= $row[2 ]; //	codice_socio
-        $row_interni->nome						= $row[3 ]; //	Cognome
-        $row_interni->cognome					= $row[4 ]; //	Nome
+        $row_interni->cognome					= $row[3 ]; //	Cognome
+        $row_interni->nome  					= $row[4 ]; //	Nome
         $row_interni->residenza					= $row[5 ]; //	residenza
         $row_interni->prov						= $row[6 ]; //	prov
         $row_interni->telefono					= $row[7 ]; //	tel
