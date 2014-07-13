@@ -516,24 +516,6 @@ function mapKinderheim($row){
 
         $kk_row = R::dispense('kinder');
 
-        Nome bambino/a
-Cognome del bambino/a
-Data di nascita
-età
-Al KH dal
-Fino al
-Da quale giorno a quale giorno starà il minorenne al campo?
-            COD. SOCIO
-            Nome - Cognome genitore 1
-Nome gen.1
-COD. SOCIO
-Nome - Cognome genitore 2
-Nome genitore 2
-Email genitore/i
-Cellulare genitore/i
-Cosa fanno i genitori alla route
-
-
         $kk_row->nome						= $row[1 ];
         $kk_row->cognome					= $row[2 ];
         $kk_row->datan						= $row[3 ];
