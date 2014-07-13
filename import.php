@@ -516,6 +516,24 @@ function mapKinderheim($row){
 
         $kk_row = R::dispense('kinder');
 
+        Nome bambino/a
+Cognome del bambino/a
+Data di nascita
+età
+Al KH dal
+Fino al
+Da quale giorno a quale giorno starà il minorenne al campo?
+            COD. SOCIO
+            Nome - Cognome genitore 1
+Nome gen.1
+COD. SOCIO
+Nome - Cognome genitore 2
+Nome genitore 2
+Email genitore/i
+Cellulare genitore/i
+Cosa fanno i genitori alla route
+
+
         $kk_row->nome						= $row[1 ];
         $kk_row->cognome					= $row[2 ];
         $kk_row->datan						= $row[3 ];
@@ -532,6 +550,7 @@ function mapKinderheim($row){
         $kk_row->email						= $row[14];
         $kk_row->cellulare					= $row[15];
         $kk_row->ruologenitori				= $row[16];
+        /*
         $kk_row->soggiornogenitori			= $row[17];
         $kk_row->dietaalimentare			= $row[18];
         $kk_row->esigenzealimentari			= $row[19];
@@ -547,7 +566,7 @@ function mapKinderheim($row){
 
         $kk_row->privacy					= $row[30];
         $kk_row->schedainformativa			= $row[31];
-
+        */
 
         $id = R::store($kk_row);
 
