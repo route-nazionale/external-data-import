@@ -557,6 +557,31 @@ function mapKinderheim($row){
 
 }
 
+function mapCapiSpalla($row){
+
+    if ( !empty($row[0]) ){
+
+        $kk_row = R::dispense('capispalla');
+
+        $kk_row->nome						= $row[0 ];
+        $kk_row->cognome					= $row[1 ];
+        $kk_row->codicecensimento           = $row[2 ];
+        $kk_row->dtnascita                  = $row[3 ];
+        $kk_row->regione                    = $row[4 ];
+        $kk_row->gruppo                     = $row[5 ];
+        $kk_row->tipo                       = $row[6 ]; //tr o lab
+        $kk_row->lingue                     = $row[7 ];
+
+        $id = R::store($kk_row);
+
+    }
+
+
+}
+
+
+
+
 $strict = in_array('--strict', $_SERVER['argv']);
 $arguments = new \cli\Arguments(compact('strict'));
 
@@ -597,6 +622,8 @@ $arguments->addFlag(array('import-clan-lab', 'a'), 'Turn on import clan lab [FIL
 
 $arguments->addFlag(array('import-animatori-lab-interni', 'I'), 'Turn on import animatori lab [FILE]');
 $arguments->addFlag(array('import-animatori-lab-esterni', 'E'), 'Turn on import animatori lab [FILE]');
+
+$arguments->addFlag(array('import-capi-spalla', 'C'), 'Turn on import capi spalla [FILE]');
 
 
 $arguments->parse();
@@ -1600,6 +1627,20 @@ try {
         excelFileParsing($inputFileName,'mapLaboratoriInterni',2, $log, 'Lab Interno ');
 
     }
+
+    if (isset($arguments_parsed['import-capi-spalla'])) {
+
+        $inputFileName = 'capispalla.xlsx';
+        if ( !empty($filename) ){
+            $inputFileName = $filename;
+        }
+
+        excelFileParsing($inputFileName,'mapCapiSpalla',2, $log, 'Capi spalla');
+
+    }
+
+
+
 
     if ( isset($arguments_parsed['import-internal-rs']) ) {
 
